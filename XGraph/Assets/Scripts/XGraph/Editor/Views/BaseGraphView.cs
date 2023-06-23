@@ -25,31 +25,6 @@ namespace XGraph
             grid.StretchToParentSize();
         }
 
-        private Node CreateNode(string name, Vector2 position, bool hasOutputPort = false)
-        {
-            var node = new Node
-            {
-                title = name
-            };
-
-            node.SetPosition(new Rect(position, new Vector2(150, 100)));
-
-            var inputPort = node.InstantiatePort(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                typeof(float));
-            inputPort.portName = "Input";
-            node.inputContainer.Add(inputPort);
-
-            if (hasOutputPort)
-            {
-                var outputPort = node.InstantiatePort(Orientation.Horizontal, Direction.Output, Port.Capacity.Single,
-                    typeof(float));
-                outputPort.portName = "Output";
-                node.outputContainer.Add(outputPort);
-            }
-
-            return node;
-        }
-
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
         {
             var compatiblePorts = new List<Port>();
@@ -72,14 +47,14 @@ namespace XGraph
             // 添加创建节点1的菜单项
             evt.menu.AppendAction("创建节点1", (action) =>
             {
-                var node = CreateNode("节点1", evt.localMousePosition, true);
+                var node = CreateNode("节点1", evt.mousePosition);
                 AddElement(node);
             });
 
             // 添加创建节点2的菜单项
             evt.menu.AppendAction("创建节点2", (action) =>
             {
-                var node = CreateNode("节点2", evt.localMousePosition, false);
+                var node = CreateNode("节点2", evt.localMousePosition);
                 AddElement(node);
             });
         }
@@ -97,11 +72,16 @@ namespace XGraph
                     { title = node.title, x = position.x, y = position.y, guid = node.viewDataKey });
             });
 
-            // 保存连接信息
+// 保存连接信息
             edges.ForEach((edge) =>
             {
                 edgeDataList.Add(new EdgeData
-                    { outputNodeGuid = edge.output.node.viewDataKey, inputNodeGuid = edge.input.node.viewDataKey });
+                {
+                    outputNodeGuid = edge.output.node.viewDataKey,
+                    outputPortName = edge.output.portName,
+                    inputNodeGuid = edge.input.node.viewDataKey,
+                    inputPortName = edge.input.portName
+                });
             });
 
             // 将数据序列化为 JSON
@@ -135,24 +115,41 @@ namespace XGraph
                 AddElement(node);
             }
 
-            // 创建并添加连接
+    // 创建并添加连接
             foreach (var edgeData in edgeDataList)
             {
                 var outputNode = nodeDict[edgeData.outputNodeGuid];
                 var inputNode = nodeDict[edgeData.inputNodeGuid];
 
-                // 找到合适的端口进行连接（这里简单地使用了第一个端口，根据你的需求可能需要更复杂的逻辑）
+                // 找到合适的端口进行连接
+                var outputPort = FindPortByName(outputNode.outputContainer, edgeData.outputPortName);
+                var inputPort = FindPortByName(inputNode.inputContainer, edgeData.inputPortName);
+
+                // 创建边缘并连接它
                 var edge = new Edge
                 {
-                    output = outputNode.Q<Port>(),
-                    input = inputNode.Q<Port>()
+                    output = outputPort,
+                    input = inputPort
                 };
                 edge.input.Connect(edge);
                 edge.output.Connect(edge);
+
+                // 将边缘添加到GraphView
                 AddElement(edge);
             }
         }
 
+        private Port FindPortByName(VisualElement container, string portName)
+        {
+            foreach (var child in container.Children())
+            {
+                if (child is Port port && port.portName == portName)
+                {
+                    return port;
+                }
+            }
+            return null;
+        }
         private Node CreateNode(string title, Vector2 position)
         {
             var node = new Node { title = title };
