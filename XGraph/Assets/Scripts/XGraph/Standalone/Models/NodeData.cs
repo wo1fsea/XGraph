@@ -1,16 +1,36 @@
-
+using System;
 
 namespace XGraph
 {
-    [System.Serializable]
-    public class NodeData
+    [Serializable]
+    public class BaseNodeData
     {
         public string title;
-        public float x, y;
-        public string guid;  // 唯一标识符，用于连接的参考
+        public float x;
+        public float y;
+        public string guid;
+        public string nodeType; // "NodeData1" or "NodeData2"
+        
+        public BaseNodeData()
+        {
+            guid = Guid.NewGuid().ToString();
+            title = "New Node";
+        }
     }
 
-    [System.Serializable]
+    [Serializable]
+    public class NodeData1 : BaseNodeData
+    {
+        public string stringProp;
+    }
+
+    [Serializable]
+    public class NodeData2 : BaseNodeData
+    {
+        public int intProp;
+    }
+
+    [Serializable]
     public class EdgeData
     {
         public string outputNodeGuid; // 输出节点的唯一标识符

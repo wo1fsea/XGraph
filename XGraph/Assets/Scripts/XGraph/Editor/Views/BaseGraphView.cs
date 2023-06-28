@@ -1,9 +1,9 @@
-using UnityEditor;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace XGraph
 {
@@ -16,7 +16,7 @@ namespace XGraph
             this.AddManipulator(new RectangleSelector());
             this.AddManipulator(new ContextualMenuManipulator(OnContextMenuPopulate));
 
-            this.SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
+            SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
 
             // 添加节点网格
             var grid = new GridBackground();
@@ -32,7 +32,7 @@ namespace XGraph
             ports.ForEach(port =>
             {
                 if (startPort != port && startPort.node != port.node &&
-                    startPort.direction != port.direction) // 添加这个条件
+                    startPort.direction != port.direction)
                 {
                     compatiblePorts.Add(port);
                 }
@@ -44,88 +44,127 @@ namespace XGraph
         // 处理上下文菜单事件
         private void OnContextMenuPopulate(ContextualMenuPopulateEvent evt)
         {
+            var mousePos = (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
             // 添加创建节点1的菜单项
             evt.menu.AppendAction("创建节点1", (action) =>
             {
-                var node = CreateNode("节点1", evt.mousePosition);
+                NodeData1 nodeData = new NodeData1
+                {
+                    nodeType = "NodeData1",
+                    stringProp = "example", // Some string value
+                    x = mousePos.x,
+                    y = mousePos.y,
+                };
+                var node = CreateNode(nodeData);
                 AddElement(node);
             });
 
             // 添加创建节点2的菜单项
             evt.menu.AppendAction("创建节点2", (action) =>
             {
-                var node = CreateNode("节点2", evt.localMousePosition);
+                NodeData2 nodeData = new NodeData2
+                {
+                    nodeType = "NodeData2",
+                    intProp = 123, // Some int value
+                    x = mousePos.x,
+                    y = mousePos.y,
+                };
+                var node = CreateNode(nodeData);
                 AddElement(node);
             });
         }
 
         public void SaveToFile(string filepath)
         {
-            var nodeDataList = new List<NodeData>();
+            var nodeDataList = new List<BaseNodeData>();
             var edgeDataList = new List<EdgeData>();
 
-            // 保存节点信息
+            // Save node information
             nodes.ForEach((node) =>
             {
-                var position = node.GetPosition();
-                nodeDataList.Add(new NodeData
-                    { title = node.title, x = position.x, y = position.y, guid = node.viewDataKey });
+                var nodeView = node as BaseNodeView;
+                if (nodeView == null)
+                {
+                    return;
+                }
+                nodeDataList.Add(nodeView.NodeData);
             });
-
-// 保存连接信息
+            // Save connection information
             edges.ForEach((edge) =>
             {
+                var outputNode = edge.output.node as BaseNodeView;
+                var inputNode = edge.input.node as BaseNodeView;
+                if (outputNode == null || inputNode == null)
+                {
+                    return;
+                }
+                
                 edgeDataList.Add(new EdgeData
                 {
-                    outputNodeGuid = edge.output.node.viewDataKey,
+                    outputNodeGuid = outputNode.NodeData.guid,
                     outputPortName = edge.output.portName,
-                    inputNodeGuid = edge.input.node.viewDataKey,
+                    inputNodeGuid = inputNode.NodeData.guid,
                     inputPortName = edge.input.portName
                 });
             });
 
-            // 将数据序列化为 JSON
-            var jsonNodes = JsonUtility.ToJson(new SerializationWrapper<NodeData> { items = nodeDataList });
-            var jsonEdges = JsonUtility.ToJson(new SerializationWrapper<EdgeData> { items = edgeDataList });
+            // Serialize and write to file
+            var graphData = new Dictionary<string, object>
+            {
+                { "nodes", nodeDataList },
+                { "edges", edgeDataList }
+            };
+    
+            string jsonData = JsonConvert.SerializeObject(graphData, Formatting.Indented);
 
-            // 写入到文件
-            File.WriteAllText(filepath + "_nodes.json", jsonNodes);
-            File.WriteAllText(filepath + "_edges.json", jsonEdges);
+            // Write the JSON string to a file
+            File.WriteAllText(filepath, jsonData);
         }
 
         public void LoadFromFile(string filepath)
         {
-            // 读取文件并反序列化数据
-            string jsonNodes = File.ReadAllText(filepath + "_nodes.json");
-            string jsonEdges = File.ReadAllText(filepath + "_edges.json");
+            // Read the file
+            string jsonData = File.ReadAllText(filepath);
+            var graphData = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonData);
 
-            var nodeDataList = JsonUtility.FromJson<SerializationWrapper<NodeData>>(jsonNodes).items;
-            var edgeDataList = JsonUtility.FromJson<SerializationWrapper<EdgeData>>(jsonEdges).items;
+            // Extract nodes and edges
+            var nodeDataJsonList = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(graphData["nodes"].ToString());
+            var edgeDataList = JsonConvert.DeserializeObject<List<EdgeData>>(graphData["edges"].ToString());
 
-            // 清除当前的图
+            // Clear the current graph
             DeleteElements(graphElements.ToList());
 
-            // 创建并添加节点
+            // Create and add nodes
             var nodeDict = new Dictionary<string, Node>();
-            foreach (var nodeData in nodeDataList)
+            foreach (var nodeDataJson in nodeDataJsonList)
             {
-                var node = CreateNode(nodeData.title, new Vector2(nodeData.x, nodeData.y));
-                node.viewDataKey = nodeData.guid;
+                BaseNodeData nodeData;
+                string nodeDataJsonString = JsonConvert.SerializeObject(nodeDataJson);
+                if (nodeDataJson["nodeType"].ToString() == "NodeData1")
+                {
+                    nodeData = JsonConvert.DeserializeObject<NodeData1>(nodeDataJsonString);
+                }
+                else
+                {
+                    nodeData = JsonConvert.DeserializeObject<NodeData2>(nodeDataJsonString);
+                }
+
+                var node = CreateNode(nodeData);
                 nodeDict[nodeData.guid] = node;
                 AddElement(node);
             }
 
-    // 创建并添加连接
+            // Create and add connections
             foreach (var edgeData in edgeDataList)
             {
                 var outputNode = nodeDict[edgeData.outputNodeGuid];
                 var inputNode = nodeDict[edgeData.inputNodeGuid];
 
-                // 找到合适的端口进行连接
+                // Find the appropriate ports to connect
                 var outputPort = FindPortByName(outputNode.outputContainer, edgeData.outputPortName);
                 var inputPort = FindPortByName(inputNode.inputContainer, edgeData.inputPortName);
 
-                // 创建边缘并连接它
+                // Create the edge and connect it
                 var edge = new Edge
                 {
                     output = outputPort,
@@ -134,7 +173,7 @@ namespace XGraph
                 edge.input.Connect(edge);
                 edge.output.Connect(edge);
 
-                // 将边缘添加到GraphView
+                // Add the edge to the GraphView
                 AddElement(edge);
             }
         }
@@ -150,30 +189,11 @@ namespace XGraph
             }
             return null;
         }
-        private Node CreateNode(string title, Vector2 position)
+        public Node CreateNode(BaseNodeData nodeData)
         {
-            var node = new Node { title = title };
-            node.SetPosition(new Rect(position, Vector2.zero));
-
-            // 添加输入端口
-            var inputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Input, Port.Capacity.Single,
-                typeof(float));
-            inputPort.portName = "Input";
-            node.inputContainer.Add(inputPort);
-
-            // 添加输出端口
-            var outputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi,
-                typeof(float));
-            outputPort.portName = "Output";
-            node.outputContainer.Add(outputPort);
-
+            BaseNodeView node = new BaseNodeView(nodeData);
+            node.SetPosition(new Rect(new Vector2(nodeData.x, nodeData.y), Vector2.zero));
             return node;
-        }
-
-        [System.Serializable]
-        private class SerializationWrapper<T>
-        {
-            public List<T> items;
         }
     }
 }

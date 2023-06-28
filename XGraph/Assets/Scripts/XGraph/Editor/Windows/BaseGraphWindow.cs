@@ -45,12 +45,26 @@ namespace XGraph
             buttonContainer.style.paddingRight = 5;
 
             // 创建保存按钮并添加到容器中
-            Button saveButton = new Button(() => _graphView.SaveToFile("Assets/myGraph.json"));
+            Button saveButton = new Button(() =>
+            {
+                string path = EditorUtility.SaveFilePanel("Save Graph", "Assets", "myGraph", "json");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _graphView.SaveToFile(path);
+                }
+            });
             saveButton.text = "Save";
             buttonContainer.Add(saveButton);
 
             // 创建加载按钮并添加到容器中
-            Button loadButton = new Button(() => _graphView.LoadFromFile("Assets/myGraph.json"));
+            Button loadButton = new Button(() =>
+            {
+                string path = EditorUtility.OpenFilePanel("Select Graph file", "Assets", "json");
+                if (!string.IsNullOrEmpty(path))
+                {
+                    _graphView.LoadFromFile(path);
+                }
+            });
             loadButton.text = "Load";
             buttonContainer.Add(loadButton);
 
