@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XGraphStandalone", "XGraphS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{9faf6924-c958-b9db-3fc2-9448eac4d2c6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{09678b78-9f80-f28f-c572-b51e96098a99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,6 +20,8 @@ Global
 		{2f08abfb-bec3-aa4a-0490-64e8a808b113}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9faf6924-c958-b9db-3fc2-9448eac4d2c6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9faf6924-c958-b9db-3fc2-9448eac4d2c6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09678b78-9f80-f28f-c572-b51e96098a99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09678b78-9f80-f28f-c572-b51e96098a99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -2,7 +2,7 @@
     "name": "XGraphEditor",
     "rootNamespace": "",
     "references": [
-        "XGraphStandalone"
+        "XGraphEditor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -1,9 +1,7 @@
 {
-    "name": "XGraphEditor",
+    "name": "XGraphStandalone",
     "rootNamespace": "",
-    "references": [
-        "XGraphStandalone"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -45,6 +45,7 @@
      <Compile Include="Assets\Scripts\XGraph\Editor\Views\BaseNodeView.cs" />
      <Compile Include="Assets\Scripts\XGraph\Editor\Views\BaseGraphView.cs" />
      <Compile Include="Assets\Scripts\XGraph\Editor\Views\BasePortView.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Editor\Views\BaseEdgeView.cs" />
      <Folder Include="Assets\Scripts\XGraph\Editor\Windows" />
      <None Include="Assets\Scripts\XGraph\Editor\XGraphEditor.asmdef" />
      <Folder Include="Assets\Scripts\XGraph\Editor" />

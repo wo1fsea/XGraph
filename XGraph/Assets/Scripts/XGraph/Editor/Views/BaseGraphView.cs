@@ -3,13 +3,17 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 
 namespace XGraph
 {
-    public class MyGraphView : GraphView
+    public class BaseGraphView : GraphView
     {
-        public MyGraphView()
+        private BaseGraphData _graphData;
+        public BaseGraphData GraphData => _graphData;
+
+        private Dictionary<string, BaseNodeView> nodeViews;
+
+        public BaseGraphView()
         {
             this.AddManipulator(new ContentDragger());
             this.AddManipulator(new SelectionDragger());
@@ -23,6 +27,88 @@ namespace XGraph
             grid.visible = true;
             Insert(0, grid);
             grid.StretchToParentSize();
+
+            graphViewChanged = OnGraphViewChanged;
+
+            _graphData = new BaseGraphData("New Graph");
+            nodeViews = new Dictionary<string, BaseNodeView>();
+        }
+
+        private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
+        {
+            if (graphViewChange.elementsToRemove != null)
+            {
+                foreach (var element in graphViewChange.elementsToRemove)
+                {
+                    if (element is BaseEdgeView)
+                    {
+                        _graphData.edges.Remove((element as BaseEdgeView).EdgeData);
+                    }
+                }
+            }
+
+            if (graphViewChange.edgesToCreate != null)
+            {
+                List<Edge> edgesToCreate = new List<Edge>();
+                foreach (var edge in graphViewChange.edgesToCreate)
+                {
+                    if (edge is BaseEdgeView)
+                    {
+                        edgesToCreate.Add(edge);
+                    }
+                    else
+                    {
+                        BaseEdgeData baseEdgeData = new BaseEdgeData
+                        {
+                            inputNodeGuid = (edge.input.node as BaseNodeView)?.NodeData.guid,
+                            outputNodeGuid = (edge.output.node as BaseNodeView)?.NodeData.guid,
+                            inputPortName = edge.input.portName,
+                            outputPortName = edge.output.portName
+                        };
+
+                        var baseEdgeView = CreateEdge(baseEdgeData);
+                        _graphData.edges.Add(baseEdgeData);
+                        edgesToCreate.Add(baseEdgeView);
+                    }
+                }
+
+                graphViewChange.edgesToCreate = edgesToCreate;
+            }
+
+            return graphViewChange;
+        }
+
+        private void AddNode(BaseNodeData nodeData)
+        {
+            _graphData.nodes.Add(nodeData);
+            var node = CreateNode(nodeData);
+            nodeViews[node.NodeData.guid] = node;
+            AddElement(node);
+        }
+
+        private void AddEdge(BaseEdgeData baseEdgeData)
+        {
+            _graphData.edges.Add(baseEdgeData);
+            var edge = CreateEdge(baseEdgeData);
+            AddElement(edge);
+        }
+
+        private void RefreshGraphView()
+        {
+            DeleteElements(graphElements.ToList());
+
+            foreach (var nodeData in _graphData.nodes)
+            {
+                var node = CreateNode(nodeData);
+                AddElement(node);
+                nodeViews[node.NodeData.guid] = node;
+            }
+
+            foreach (var edgeData in _graphData.edges)
+            {
+                var edge = CreateEdge(edgeData);
+                AddElement(edge);
+            }
         }
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)
@@ -31,8 +117,11 @@ namespace XGraph
 
             ports.ForEach(port =>
             {
-                if (startPort != port && startPort.node != port.node &&
-                    startPort.direction != port.direction)
+                if (startPort != port && startPort.node != port.node && (
+                        (startPort.direction == Direction.Output && port.direction == Direction.Input &&
+                         port.portType.IsAssignableFrom(startPort.portType))
+                        || (startPort.direction == Direction.Input && port.direction == Direction.Output &&
+                            startPort.portType.IsAssignableFrom(port.portType))))
                 {
                     compatiblePorts.Add(port);
                 }
@@ -44,19 +133,17 @@ namespace XGraph
         // 处理上下文菜单事件
         private void OnContextMenuPopulate(ContextualMenuPopulateEvent evt)
         {
-            var mousePos = (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
+            var mousePos =
+                (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
             // 添加创建节点1的菜单项
             evt.menu.AppendAction("创建节点1", (action) =>
             {
                 NodeData1 nodeData = new NodeData1
                 {
-                    nodeType = "NodeData1",
-                    stringProp = "example", // Some string value
                     x = mousePos.x,
-                    y = mousePos.y,
+                    y = mousePos.y
                 };
-                var node = CreateNode(nodeData);
-                AddElement(node);
+                AddNode(nodeData);
             });
 
             // 添加创建节点2的菜单项
@@ -64,118 +151,24 @@ namespace XGraph
             {
                 NodeData2 nodeData = new NodeData2
                 {
-                    nodeType = "NodeData2",
-                    intProp = 123, // Some int value
                     x = mousePos.x,
-                    y = mousePos.y,
+                    y = mousePos.y
                 };
-                var node = CreateNode(nodeData);
-                AddElement(node);
+                AddNode(nodeData);
             });
         }
 
         public void SaveToFile(string filepath)
         {
-            var nodeDataList = new List<BaseNodeData>();
-            var edgeDataList = new List<EdgeData>();
-
-            // Save node information
-            nodes.ForEach((node) =>
-            {
-                var nodeView = node as BaseNodeView;
-                if (nodeView == null)
-                {
-                    return;
-                }
-                nodeDataList.Add(nodeView.NodeData);
-            });
-            // Save connection information
-            edges.ForEach((edge) =>
-            {
-                var outputNode = edge.output.node as BaseNodeView;
-                var inputNode = edge.input.node as BaseNodeView;
-                if (outputNode == null || inputNode == null)
-                {
-                    return;
-                }
-                
-                edgeDataList.Add(new EdgeData
-                {
-                    outputNodeGuid = outputNode.NodeData.guid,
-                    outputPortName = edge.output.portName,
-                    inputNodeGuid = inputNode.NodeData.guid,
-                    inputPortName = edge.input.portName
-                });
-            });
-
-            // Serialize and write to file
-            var graphData = new Dictionary<string, object>
-            {
-                { "nodes", nodeDataList },
-                { "edges", edgeDataList }
-            };
-    
-            string jsonData = JsonConvert.SerializeObject(graphData, Formatting.Indented);
-
-            // Write the JSON string to a file
-            File.WriteAllText(filepath, jsonData);
+            File.WriteAllText(filepath, _graphData.ToJson());
         }
 
         public void LoadFromFile(string filepath)
         {
             // Read the file
             string jsonData = File.ReadAllText(filepath);
-            var graphData = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonData);
-
-            // Extract nodes and edges
-            var nodeDataJsonList = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(graphData["nodes"].ToString());
-            var edgeDataList = JsonConvert.DeserializeObject<List<EdgeData>>(graphData["edges"].ToString());
-
-            // Clear the current graph
-            DeleteElements(graphElements.ToList());
-
-            // Create and add nodes
-            var nodeDict = new Dictionary<string, Node>();
-            foreach (var nodeDataJson in nodeDataJsonList)
-            {
-                BaseNodeData nodeData;
-                string nodeDataJsonString = JsonConvert.SerializeObject(nodeDataJson);
-                if (nodeDataJson["nodeType"].ToString() == "NodeData1")
-                {
-                    nodeData = JsonConvert.DeserializeObject<NodeData1>(nodeDataJsonString);
-                }
-                else
-                {
-                    nodeData = JsonConvert.DeserializeObject<NodeData2>(nodeDataJsonString);
-                }
-
-                var node = CreateNode(nodeData);
-                nodeDict[nodeData.guid] = node;
-                AddElement(node);
-            }
-
-            // Create and add connections
-            foreach (var edgeData in edgeDataList)
-            {
-                var outputNode = nodeDict[edgeData.outputNodeGuid];
-                var inputNode = nodeDict[edgeData.inputNodeGuid];
-
-                // Find the appropriate ports to connect
-                var outputPort = FindPortByName(outputNode.outputContainer, edgeData.outputPortName);
-                var inputPort = FindPortByName(inputNode.inputContainer, edgeData.inputPortName);
-
-                // Create the edge and connect it
-                var edge = new Edge
-                {
-                    output = outputPort,
-                    input = inputPort
-                };
-                edge.input.Connect(edge);
-                edge.output.Connect(edge);
-
-                // Add the edge to the GraphView
-                AddElement(edge);
-            }
+            _graphData = BaseGraphData.CreateFromJson(jsonData);
+            RefreshGraphView();
         }
 
         private Port FindPortByName(VisualElement container, string portName)
@@ -187,13 +180,36 @@ namespace XGraph
                     return port;
                 }
             }
+
             return null;
         }
-        public Node CreateNode(BaseNodeData nodeData)
+
+        public BaseNodeView CreateNode(BaseNodeData nodeData)
         {
             BaseNodeView node = new BaseNodeView(nodeData);
             node.SetPosition(new Rect(new Vector2(nodeData.x, nodeData.y), Vector2.zero));
             return node;
+        }
+
+        public Edge CreateEdge(BaseEdgeData baseEdgeData)
+        {
+            var outputNode = nodeViews[baseEdgeData.outputNodeGuid];
+            var inputNode = nodeViews[baseEdgeData.inputNodeGuid];
+
+            // Find the appropriate ports to connect
+            var outputPort = FindPortByName(outputNode.outputContainer, baseEdgeData.outputPortName);
+            var inputPort = FindPortByName(inputNode.inputContainer, baseEdgeData.inputPortName);
+
+            // Create the edge and connect it
+            var edge = new BaseEdgeView(baseEdgeData)
+            {
+                output = outputPort,
+                input = inputPort
+            };
+            edge.input.Connect(edge);
+            edge.output.Connect(edge);
+
+            return edge;
         }
     }
 }

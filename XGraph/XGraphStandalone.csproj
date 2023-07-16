@@ -42,9 +42,14 @@
   </PropertyGroup>
   <ItemGroup>
      <Compile Include="Assets\Scripts\XGraph\Standalone\Models\NodeData.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\Attributes.cs" />
      <Compile Include="Assets\Scripts\XGraph\Standalone\PackageInfo.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\GraphData.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\BaseEdgeData.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Tests\Nodes.cs" />
      <Folder Include="Assets\Scripts\XGraph\Standalone" />
      <None Include="Assets\Scripts\XGraph\Standalone\XGraphStandalone.asmdef" />
+     <Folder Include="Assets\Scripts\XGraph\Standalone\Tests" />
      <Folder Include="Assets\Scripts\XGraph\Standalone\Models" />
      <Reference Include="UnityEngine">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

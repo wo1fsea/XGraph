@@ -1,80 +1,135 @@
 using UnityEditor.Experimental.GraphView;
 using UnityEngine.UIElements;
 using UnityEngine;
+using System;
+using System.Reflection;
+using UnityEditor.UIElements;
 
 namespace XGraph
 {
     public class BaseNodeView : Node
     {
         private BaseNodeData _nodeData;
-        public event System.Action<Vector2> OnPositionChanged;
-        
+        public BaseNodeData NodeData => _nodeData;
+        public event Action<Vector2> OnPositionChanged;
+
         public BaseNodeView(BaseNodeData nodeData)
         {
             _nodeData = nodeData;
-            
-            // 设置节点标题
-            title = nodeData.title;
 
-            // 根据不同的数据类型动态添加编辑框
-            if (nodeData is NodeData1)
-            {
-                var stringData = nodeData as NodeData1;
-                TextField textField = new TextField("String Property:");
-                textField.value = stringData.stringProp;
-                textField.RegisterValueChangedCallback(evt => { stringData.stringProp = evt.newValue; });
-                this.extensionContainer.Add(textField);
-            }
-            else if (nodeData is NodeData2)
-            {
-                var intData = nodeData as NodeData2;
-                TextField textField = new TextField("Integer Property:");
-                textField.value = intData.intProp.ToString();
-                textField.RegisterValueChangedCallback(evt =>
-                {
-                    int result;
-                    if (int.TryParse(evt.newValue, out result))
-                    {
-                        intData.intProp = result;
-                    }
-                    else
-                    {
-                        textField.value = intData.intProp.ToString(); // Reset to valid value if parsing fails
-                    }
-                });
-                this.extensionContainer.Add(textField);
-            }
-            
-            // 添加输入端口
-            var inputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Input, Port.Capacity.Multi, typeof(float));
-            inputPort.portName = "Input";
-            inputContainer.Add(inputPort);
-
-            // 添加输出端口
-            var outputPort = Port.Create<Edge>(Orientation.Horizontal, Direction.Output, Port.Capacity.Multi, typeof(float));
-            outputPort.portName = "Output";
-            outputContainer.Add(outputPort);
-            
             // 监听位置变化事件
-            this.RegisterCallback<GeometryChangedEvent>(evt =>
+            RegisterCallback<GeometryChangedEvent>(evt =>
             {
+                _nodeData.x = evt.newRect.x;
+                _nodeData.y = evt.newRect.y;
                 OnPositionChanged?.Invoke(evt.newRect.position);
             });
-            
+
+            // 设置节点标题
+            title = nodeData.Title;
+
+            HandleNodeDataAttributes(_nodeData);
+
             // 刷新UI
-            this.RefreshExpandedState();
-            this.RefreshPorts();
+            RefreshExpandedState();
+            RefreshPorts();
         }
-       
-        public void UpdateNodeDataPosition(Vector2 newPosition)
+
+        private void HandleNodeDataAttributes(BaseNodeData nodeData)
         {
-            _nodeData.x = newPosition.x;
-            _nodeData.y = newPosition.y;
-        }
+            FieldInfo[] fields = nodeData.GetType()
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            foreach (FieldInfo field in fields)
+            {
+                if (Attribute.GetCustomAttribute(field, typeof(PropertyAttribute)) is PropertyAttribute
+                    propertyAttribute)
+                { 
+                    VisualElement baseField = null;
+                    var fieldType = field.FieldType;
         
-        public BaseNodeData NodeData
+                    // 检查字段类型并创建相应的输入字段
+                    if (fieldType == typeof(int))
+                    {
+                        var integerField = new IntegerField(propertyAttribute.name);
+                        integerField.SetValueWithoutNotify((int) field.GetValue(nodeData));
+                        integerField.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = integerField;
+                    }
+                    else if (fieldType == typeof(float))
+                    {
+                        var floatField = new FloatField(propertyAttribute.name);
+                        floatField.SetValueWithoutNotify((float) field.GetValue(nodeData));
+                        floatField.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = floatField;
+                    }
+                    else if (fieldType == typeof(string))
+                    {
+                        var textField = new TextField(propertyAttribute.name);
+                        textField.SetValueWithoutNotify((string) field.GetValue(nodeData));
+                        textField.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = textField;
+
+                    }
+                    else if (fieldType == typeof(bool))
+                    {
+                        var toggle = new Toggle(propertyAttribute.name);
+                        toggle.SetValueWithoutNotify((bool) field.GetValue(nodeData));
+                        toggle.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = toggle;
+                        
+                    }
+                    // ... 其他类型
+        
+                    if (baseField != null)
+                    {
+                        var inputElement = baseField.Q(TextField.textInputUssName);
+                        inputElement.style.minWidth = 50;
+                        inputContainer.Add(baseField);
+                    }
+                    continue;
+                }
+
+                if (Attribute.GetCustomAttribute(field, typeof(InputAttribute)) is InputAttribute inputAttribute)
+                {
+                    // 添加输出端口
+                    Port.Capacity capacity =
+                        inputAttribute.multipleConnect ? Port.Capacity.Multi : Port.Capacity.Single;
+                    var inputPort = GeneratePort(Orientation.Horizontal, Direction.Input, capacity, field.FieldType);
+                    inputPort.portName = inputAttribute.name;
+                    inputContainer.Add(inputPort);
+                    continue;
+                }
+
+                if (Attribute.GetCustomAttribute(field, typeof(OutputAttribute)) is OutputAttribute outputAttribute)
+                {
+                    // 添加输出端口
+                    Port.Capacity capacity =
+                        outputAttribute.multipleConnect ? Port.Capacity.Multi : Port.Capacity.Single;
+                    var outputPort = GeneratePort(Orientation.Horizontal, Direction.Output, capacity, field.FieldType);
+                    outputPort.portName = outputAttribute.name;
+                    outputContainer.Add(outputPort);
+                    continue;
+                }
+            }
+        }
+
+        private Port GeneratePort(Orientation orientation, Direction direction, Port.Capacity capacity,
+            Type type)
         {
-            get { return _nodeData; }
+            return new BasePortView(orientation, direction, capacity, type);
         }
     }
 }

@@ -42,9 +42,14 @@
   </PropertyGroup>
   <ItemGroup>
      <Folder Include="Assets" />
+     <Folder Include="Assets\Scripts\XStoryline\Standalone\Models\Nodes" />
      <Folder Include="Assets\Scenes" />
+     <Folder Include="Assets\Scripts\XStoryline\Standalone" />
      <Folder Include="Assets\Scripts\XUI" />
+     <None Include="Assets\Scripts\XStoryline\Standalone\XStorylineStandalone.asmdef" />
      <Folder Include="Assets\Scripts" />
+     <Folder Include="Assets\Scripts\XStoryline\Standalone\Models" />
+     <Folder Include="Assets\Scripts\XStoryline" />
      <Folder Include="Assets\Scripts\XGraph" />
      <Reference Include="UnityEngine">
      <HintPath>C:\Program Files\Unity\Hub\Editor\2021.3.23f1\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>

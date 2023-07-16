@@ -7,7 +7,8 @@ namespace XGraph
 {
     public class GraphViewWindow : EditorWindow
     {
-        private MyGraphView _graphView;
+        private BaseGraphView _graphView;
+        public BaseGraphView GraphView => _graphView;
 
         [MenuItem("XGraph/Show Window")]
         public static void ShowWindow()
@@ -28,10 +29,7 @@ namespace XGraph
 
         private void ConstructGraphView()
         {
-            _graphView = new MyGraphView
-            {
-                name = "GraphView"
-            };
+            _graphView = new BaseGraphView();
 
             _graphView.StretchToParentSize();
             // 将GraphView添加到窗口的根视觉元素
@@ -70,8 +68,6 @@ namespace XGraph
 
             // 将按钮容器添加到窗口的根视觉元素
             rootVisualElement.Add(buttonContainer);
-            
- 
         }
     }
 }
