@@ -12,6 +12,8 @@ namespace XGraph
         public List<BaseNodeData> nodes = new List<BaseNodeData>();
         public List<BaseEdgeData> edges = new List<BaseEdgeData>();
         
+        public List<StickyNoteData> stickyNotes = new List<StickyNoteData>();
+
         public BaseGraphData(string graphName)
         {
             this.graphName = graphName;

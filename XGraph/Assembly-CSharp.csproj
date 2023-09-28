@@ -42,13 +42,10 @@
   </PropertyGroup>
   <ItemGroup>
      <Folder Include="Assets" />
-     <Folder Include="Assets\Scripts\XStoryline\Standalone\Models\Nodes" />
      <Folder Include="Assets\Scenes" />
-     <Folder Include="Assets\Scripts\XStoryline\Standalone" />
+     <None Include="Assets\myGraph.json" />
      <Folder Include="Assets\Scripts\XUI" />
-     <None Include="Assets\Scripts\XStoryline\Standalone\XStorylineStandalone.asmdef" />
      <Folder Include="Assets\Scripts" />
-     <Folder Include="Assets\Scripts\XStoryline\Standalone\Models" />
      <Folder Include="Assets\Scripts\XStoryline" />
      <Folder Include="Assets\Scripts\XGraph" />
      <Reference Include="UnityEngine">

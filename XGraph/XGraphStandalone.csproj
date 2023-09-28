@@ -41,12 +41,12 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\NodeData.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\BaseNodeData.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Tests\Nodes.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\BaseEdgeData.cs" />
      <Compile Include="Assets\Scripts\XGraph\Standalone\Models\Attributes.cs" />
      <Compile Include="Assets\Scripts\XGraph\Standalone\PackageInfo.cs" />
-     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\GraphData.cs" />
-     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\BaseEdgeData.cs" />
-     <Compile Include="Assets\Scripts\XGraph\Standalone\Tests\Nodes.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\BaseGraphData.cs" />
      <Folder Include="Assets\Scripts\XGraph\Standalone" />
      <None Include="Assets\Scripts\XGraph\Standalone\XGraphStandalone.asmdef" />
      <Folder Include="Assets\Scripts\XGraph\Standalone\Tests" />

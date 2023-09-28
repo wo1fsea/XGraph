@@ -1,5 +1,5 @@
 {
-    "name": "XGraphEditor",
+    "name": "XStorylineEditor",
     "rootNamespace": "",
     "references": [
         "XGraphEditor"

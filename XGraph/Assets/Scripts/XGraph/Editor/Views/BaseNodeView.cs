@@ -1,4 +1,5 @@
 using UnityEditor.Experimental.GraphView;
+using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEngine;
 using System;
@@ -47,7 +48,7 @@ namespace XGraph
                 { 
                     VisualElement baseField = null;
                     var fieldType = field.FieldType;
-        
+                
                     // 检查字段类型并创建相应的输入字段
                     if (fieldType == typeof(int))
                     {
@@ -59,10 +60,30 @@ namespace XGraph
                         });
                         baseField = integerField;
                     }
+                    else if (fieldType == typeof(long))
+                    {
+                        var longField = new LongField(propertyAttribute.name);
+                        longField.SetValueWithoutNotify((long) field.GetValue(nodeData));
+                        longField.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = longField;
+                    }
                     else if (fieldType == typeof(float))
                     {
                         var floatField = new FloatField(propertyAttribute.name);
                         floatField.SetValueWithoutNotify((float) field.GetValue(nodeData));
+                        floatField.RegisterValueChangedCallback(evt =>
+                        {
+                            field.SetValue(nodeData, evt.newValue);
+                        });
+                        baseField = floatField;
+                    }
+                    else if (fieldType == typeof(double))
+                    {
+                        var floatField = new DoubleField(propertyAttribute.name);
+                        floatField.SetValueWithoutNotify((double) field.GetValue(nodeData));
                         floatField.RegisterValueChangedCallback(evt =>
                         {
                             field.SetValue(nodeData, evt.newValue);
@@ -78,7 +99,7 @@ namespace XGraph
                             field.SetValue(nodeData, evt.newValue);
                         });
                         baseField = textField;
-
+                
                     }
                     else if (fieldType == typeof(bool))
                     {
@@ -92,14 +113,13 @@ namespace XGraph
                         
                     }
                     // ... 其他类型
-        
+                
                     if (baseField != null)
                     {
                         var inputElement = baseField.Q(TextField.textInputUssName);
                         inputElement.style.minWidth = 50;
-                        inputContainer.Add(baseField);
+                        contentContainer.Add(baseField);
                     }
-                    continue;
                 }
 
                 if (Attribute.GetCustomAttribute(field, typeof(InputAttribute)) is InputAttribute inputAttribute)

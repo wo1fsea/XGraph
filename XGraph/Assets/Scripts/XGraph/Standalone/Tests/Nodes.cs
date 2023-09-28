@@ -2,7 +2,7 @@
 
 namespace XGraph
 {
-    [Serializable]
+    [Serializable, NodeMenuItem("test/node1")]
     public class NodeData1 : BaseNodeData
     {
         [Property("Input string")]
@@ -12,7 +12,7 @@ namespace XGraph
         public int intInput;
     }
 
-    [Serializable]
+    [Serializable, NodeMenuItem("test/node2")]
     public class NodeData2 : BaseNodeData
     {
         [Property("Input int")]

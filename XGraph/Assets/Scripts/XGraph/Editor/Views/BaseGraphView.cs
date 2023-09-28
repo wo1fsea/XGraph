@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.IO;
+using XGraph.Editor;
 
 namespace XGraph
 {
@@ -40,9 +41,19 @@ namespace XGraph
             {
                 foreach (var element in graphViewChange.elementsToRemove)
                 {
+                    if (element is BaseNodeView)
+                    {
+                        _graphData.nodes.Remove((element as BaseNodeView).NodeData);
+                    }
+                    
                     if (element is BaseEdgeView)
                     {
                         _graphData.edges.Remove((element as BaseEdgeView).EdgeData);
+                    }
+
+                    if (element is StickyNoteView)
+                    {
+                        _graphData.stickyNotes.Remove((element as StickyNoteView).StickyNoteData);
                     }
                 }
             }
@@ -85,6 +96,13 @@ namespace XGraph
             nodeViews[node.NodeData.guid] = node;
             AddElement(node);
         }
+        
+        private void AddStickyNote(StickyNoteData stickyNoteData)
+        {
+            _graphData.stickyNotes.Add(stickyNoteData);
+            var stickyNote = CreateStickyNote(stickyNoteData);
+            AddElement(stickyNote);
+        }
 
         private void AddEdge(BaseEdgeData baseEdgeData)
         {
@@ -108,6 +126,12 @@ namespace XGraph
             {
                 var edge = CreateEdge(edgeData);
                 AddElement(edge);
+            }
+
+            foreach (var stickyNodeData in _graphData.stickyNotes)
+            {
+                var stickNote = CreateStickyNote(stickyNodeData);
+                AddElement(stickNote);
             }
         }
 
@@ -135,26 +159,26 @@ namespace XGraph
         {
             var mousePos =
                 (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
-            // 添加创建节点1的菜单项
-            evt.menu.AppendAction("创建节点1", (action) =>
-            {
-                NodeData1 nodeData = new NodeData1
-                {
-                    x = mousePos.x,
-                    y = mousePos.y
-                };
-                AddNode(nodeData);
-            });
 
-            // 添加创建节点2的菜单项
-            evt.menu.AppendAction("创建节点2", (action) =>
+            var nodeTypes = NodeProvider.GetCompatibleNodes(_graphData);
+
+            foreach (var nodeType in nodeTypes)
             {
-                NodeData2 nodeData = new NodeData2
+                evt.menu.AppendAction($"create/{nodeType.Item1}", (action) =>
                 {
-                    x = mousePos.x,
-                    y = mousePos.y
-                };
-                AddNode(nodeData);
+                    BaseNodeData nodeData = System.Activator.CreateInstance(nodeType.Item2) as BaseNodeData;
+                    nodeData.x = mousePos.x;
+                    nodeData.y = mousePos.y;
+                    AddNode(nodeData);
+                });
+            }
+            
+            evt.menu.AppendAction("create/StickyNote",  (action) =>
+            {
+                StickyNoteData stickyNoteData = new StickyNoteData();
+                stickyNoteData.x = mousePos.x;
+                stickyNoteData.y = mousePos.y;
+                AddStickyNote(stickyNoteData);
             });
         }
 
@@ -210,6 +234,13 @@ namespace XGraph
             edge.output.Connect(edge);
 
             return edge;
+        }
+
+        public StickyNoteView CreateStickyNote(StickyNoteData stickyNoteData)
+        {
+            StickyNoteView stickyNote = new StickyNoteView(stickyNoteData);
+            stickyNote.SetPosition(new Rect(new Vector2(stickyNoteData.x, stickyNoteData.y), new Vector2(stickyNoteData.width, stickyNoteData.height)));
+            return stickyNote;
         }
     }
 }

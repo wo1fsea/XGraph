@@ -2,7 +2,6 @@
 
 namespace XGraph
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class XAttribute : Attribute
     {
         public string name;
@@ -35,6 +34,16 @@ namespace XGraph
     {
         public string name;
         public PropertyAttribute(string name)
+        {
+            this.name = name;
+        }
+    }
+    
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class NodeMenuItemAttribute : Attribute
+    {
+        public string name;
+        public NodeMenuItemAttribute(string name)
         {
             this.name = name;
         }

@@ -1,7 +1,7 @@
 {
-    "name": "XGraphStandalone",
+    "name": "XStorylineStandalone",
     "rootNamespace": "",
-    "references": [],
+    "references": ["XGraphStandalone"],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
