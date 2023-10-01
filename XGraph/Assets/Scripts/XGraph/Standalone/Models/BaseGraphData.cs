@@ -50,19 +50,19 @@ namespace XGraph
         public Dictionary<String, List<BaseEdgeData>> outEdges = new();
         public Dictionary<String, BaseEdgeData> inEdges = new();
 
-        public List<FlowNode> flowNodes = new();
+        public List<FlowNode> startFlowNodes = new();
 
         public static BaseGraphRuntimeData ConstructFromGraphData(BaseGraphData graphData)
         {
             BaseGraphRuntimeData runtimeData = new BaseGraphRuntimeData();
-            List<FlowNode> curFlowNodes = new();
             foreach (var nodeData in graphData.nodes)
             {
-                runtimeData.nodes.Add(nodeData.guid, nodeData);
+                var copiedNodeData = nodeData.Clone();
+                runtimeData.nodes.Add(copiedNodeData.guid, copiedNodeData);
 
-                if (nodeData is StartFlowNode flowNode)
+                if (copiedNodeData is StartFlowNode flowNode)
                 {
-                    curFlowNodes.Add(flowNode);
+                    runtimeData.startFlowNodes.Add(flowNode);
                 }
             }
 
@@ -80,32 +80,6 @@ namespace XGraph
                 runtimeData.inEdges.Add(edgeData.GetInputPortKey(), edgeData);
             }
 
-            while (curFlowNodes.Count != 0)
-            {
-                List<FlowNode> nextFlowNodes = new();
-
-                foreach (var curFlowNode in curFlowNodes)
-                {
-                    runtimeData.flowNodes.Add(curFlowNode);
-                    string portKey = curFlowNode.GetPortKey("Next");
-                    if (runtimeData.outEdges.TryGetValue(portKey, out var edgeDatas))
-                    {
-                        foreach (var edgeData in edgeDatas)
-                        {
-                            if (runtimeData.nodes.TryGetValue(edgeData.inputNodeGuid, out var nodeData))
-                            {
-                                if (nodeData is FlowNode flowNode)
-                                {
-                                    nextFlowNodes.Add(flowNode);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                curFlowNodes = nextFlowNodes;
-            }
-
             return runtimeData;
         }
 
@@ -114,31 +88,68 @@ namespace XGraph
             return (fieldInfo.GetCustomAttribute(typeof(InputAttribute)) as InputAttribute)?.name;
         }
 
-        public virtual void ProcessFlow()
+        void PullInputFiledData(FlowNode flowNode)
         {
-            foreach (var flowNode in flowNodes)
+            var inputFields = flowNode.GetInputFields();
+            foreach (var inputField in inputFields)
             {
-                var inputFields = flowNode.GetInputFields();
-                foreach (var inputField in inputFields)
+                var inputPortKey = flowNode.GetPortKey(GetInputPortName(inputField));
+                if (inEdges.TryGetValue(inputPortKey, out var edgeData))
                 {
-                    var inputPortKey = flowNode.GetPortKey(GetInputPortName(inputField));
-                    if (inEdges.TryGetValue(inputPortKey, out var edgeData))
+                    if (nodes.TryGetValue(edgeData.outputNodeGuid, out var nodeData))
                     {
-                        if (nodes.TryGetValue(edgeData.outputNodeGuid, out var nodeData))
+                        var outputField = nodeData.GetOutputFieldByPortName(edgeData.outputPortName);
+                        if (outputField == null)
                         {
-                            var outputField = nodeData.GetOutputFieldByPortName(edgeData.outputPortName);
-                            if (outputField == null)
-                            {
-                                continue;
-                            }
-
-                            inputField.SetValue(flowNode, outputField.GetValue(nodeData));
+                            continue;
+                        }
+                        
+                        var outputValue = outputField.GetValue(nodeData);
+                        outputValue = PortTypeConverter.Convert(outputValue, outputField.FieldType, inputField.FieldType);
+                        
+                        inputField.SetValue(flowNode, outputValue);
+                    }
+                }
+            }
+        }
+        
+        void GetNextFlowNodes(FlowNode flowNode, List<FlowNode> nextFlowNodes)
+        {
+            string portKey = flowNode.GetNextNodesPortKey();
+            if (outEdges.TryGetValue(portKey, out var edgeDatas))
+            {
+                foreach (var edgeData in edgeDatas)
+                {
+                    if (nodes.TryGetValue(edgeData.inputNodeGuid, out var nodeData))
+                    {
+                        if (nodeData is FlowNode nextFlowNode)
+                        {
+                            nextFlowNodes.Add(nextFlowNode);
                         }
                     }
                 }
-
-                flowNode.Process();
             }
+        }
+
+        public virtual void ProcessFlow()
+        {
+            List<FlowNode> curFlowNodes = new();
+            curFlowNodes.AddRange(startFlowNodes);
+            
+            while (curFlowNodes.Count != 0)
+            {
+                List<FlowNode> nextFlowNodes = new();
+
+                foreach (var curFlowNode in curFlowNodes)
+                {
+                    PullInputFiledData(curFlowNode);
+                    curFlowNode.Process();
+                    GetNextFlowNodes(curFlowNode, nextFlowNodes);
+                }
+                
+                curFlowNodes = nextFlowNodes;
+            }
+            
         }
     }
 }

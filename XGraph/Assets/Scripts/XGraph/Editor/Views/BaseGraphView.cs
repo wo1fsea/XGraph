@@ -1,3 +1,4 @@
+using System;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -141,11 +142,7 @@ namespace XGraph
 
             ports.ForEach(port =>
             {
-                if (startPort != port && startPort.node != port.node && (
-                        (startPort.direction == Direction.Output && port.direction == Direction.Input &&
-                         port.portType.IsAssignableFrom(startPort.portType))
-                        || (startPort.direction == Direction.Input && port.direction == Direction.Output &&
-                            startPort.portType.IsAssignableFrom(port.portType))))
+                if (IsPortCompatible(startPort, port))
                 {
                     compatiblePorts.Add(port);
                 }
@@ -164,7 +161,7 @@ namespace XGraph
 
             foreach (var nodeType in nodeTypes)
             {
-                evt.menu.AppendAction($"create/{nodeType.Item1}", (action) =>
+                evt.menu.AppendAction($"Create/{nodeType.Item1}", (action) =>
                 {
                     BaseNodeData nodeData = System.Activator.CreateInstance(nodeType.Item2) as BaseNodeData;
                     nodeData.editorPosition.X = mousePos.x;
@@ -173,7 +170,7 @@ namespace XGraph
                 });
             }
             
-            evt.menu.AppendAction("create/StickyNote",  (action) =>
+            evt.menu.AppendAction("Create/StickyNote",  (action) =>
             {
                 StickyNoteData stickyNoteData = new StickyNoteData();
                 stickyNoteData.editorPosition.X = mousePos.x;
@@ -241,6 +238,16 @@ namespace XGraph
             StickyNoteView stickyNote = new StickyNoteView(stickyNoteData);
             stickyNote.SetPosition(new Rect(new Vector2(stickyNoteData.editorPosition.X, stickyNoteData.editorPosition.Y), new Vector2(stickyNoteData.width, stickyNoteData.height)));
             return stickyNote;
+        }
+        
+        public bool IsPortCompatible(Port startPort, Port endPort)
+        {
+            return startPort != endPort && startPort.node != endPort.node && (
+                       (startPort.direction == Direction.Output && endPort.direction == Direction.Input &&
+                        endPort.portType.IsAssignableFrom(startPort.portType))
+                       || (startPort.direction == Direction.Input && endPort.direction == Direction.Output &&
+                           startPort.portType.IsAssignableFrom(endPort.portType))
+                        || PortTypeConverter.CanConvert(startPort.portType, endPort.portType));
         }
     }
 }

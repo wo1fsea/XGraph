@@ -38,7 +38,7 @@ namespace XGraph
 
         private void HandleNodeDataAttributes(BaseNodeData nodeData)
         {
-            foreach (FieldInfo field in nodeData.GetFields())
+            foreach (FieldInfo field in nodeData.GetOrderedFields())
             {
                 if (Attribute.GetCustomAttribute(field, typeof(PropertyAttribute)) is PropertyAttribute
                     propertyAttribute)
@@ -48,8 +48,12 @@ namespace XGraph
                     if (baseField != null)
                     {
                         var inputElement = baseField.Q(TextField.textInputUssName);
-                        inputElement.style.minWidth = 50;
-                        contentContainer.Add(baseField);
+                        if (inputElement != null)
+                        {
+                            inputElement.style.minWidth = 50;
+                        }
+
+                        inputContainer.Add(baseField);
                     }
                 }
 

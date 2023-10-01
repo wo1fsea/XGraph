@@ -6,17 +6,20 @@ namespace XGraph
     {
         public string name;
         public bool multipleConnect;
-        protected XAttribute(string name, bool multipleConnect = false)
+        public int showOrder;
+        
+        protected XAttribute(string name, bool multipleConnect = false, int showOrder = 0)
         {
             this.name = name;
             this.multipleConnect = multipleConnect;
+            this.showOrder = showOrder;
         }
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class InputAttribute : XAttribute
     {
-        public InputAttribute(string name, bool multipleConnect = false) : base(name, multipleConnect)
+        public InputAttribute(string name, bool multipleConnect = false, int showOrder = 0) : base(name, multipleConnect, showOrder)
         {
         }
     }
@@ -24,18 +27,16 @@ namespace XGraph
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
     public class OutputAttribute : XAttribute
     {
-        public OutputAttribute(string name, bool multipleConnect = true) : base(name, multipleConnect)
+        public OutputAttribute(string name, bool multipleConnect = true, int showOrder = 0) : base(name, multipleConnect, showOrder)
         {
         }
     } 
     
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class PropertyAttribute : Attribute
+    public class PropertyAttribute : XAttribute
     {
-        public string name;
-        public PropertyAttribute(string name)
+        public PropertyAttribute(string name, int showOrder = 0) : base(name, false, showOrder)
         {
-            this.name = name;
         }
     }
     

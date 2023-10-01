@@ -86,7 +86,12 @@ namespace XGraph
                 });
                 baseField = vector3Field;
             }
-
+            else if (fieldType.IsEnum)
+            {
+                var enumField = new EnumField(propertyAttribute.name, (Enum)field.GetValue(nodeData));
+                enumField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                baseField = enumField;
+            }
 
             return baseField;
         }

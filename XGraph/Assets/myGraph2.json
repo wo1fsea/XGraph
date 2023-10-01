@@ -1,0 +1,133 @@
+{
+  "graphName": "New Graph",
+  "nodes": [
+    {
+      "$type": "XStoryline.IntNode, XStorylineStandalone",
+      "data": 1,
+      "editorPosition": {
+        "X": -1208.5,
+        "Y": -333.0
+      },
+      "guid": "51cda31f-80e4-4354-9805-86217d073a19",
+      "Title": "Int"
+    },
+    {
+      "$type": "XStoryline.IntNode, XStorylineStandalone",
+      "data": 0,
+      "editorPosition": {
+        "X": -378.0,
+        "Y": 9.5
+      },
+      "guid": "05d76a91-00f3-4589-a7f8-9a242f80e030",
+      "Title": "Int"
+    },
+    {
+      "$type": "XStoryline.ComparingNode, XStorylineStandalone",
+      "input1": 0.0,
+      "compareType": 5,
+      "input2": 0.0,
+      "editorPosition": {
+        "X": -1236.5,
+        "Y": -175.0
+      },
+      "guid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "Title": "Comparing"
+    },
+    {
+      "$type": "XStoryline.IntPrintNode, XStorylineStandalone",
+      "input": 0,
+      "onProcessFinished": null,
+      "editorPosition": {
+        "X": -655.0,
+        "Y": -178.0
+      },
+      "guid": "ce7ae093-58e2-44bb-ac24-4d669be85daa",
+      "Title": "IntPrint"
+    },
+    {
+      "$type": "XStoryline.IntPrintNode, XStorylineStandalone",
+      "input": 0,
+      "onProcessFinished": null,
+      "editorPosition": {
+        "X": -199.0,
+        "Y": -137.0
+      },
+      "guid": "990d162b-dc96-47e4-b38d-5aaea9b74aff",
+      "Title": "IntPrint"
+    },
+    {
+      "$type": "XStoryline.StartNode, XStorylineStandalone",
+      "editorPosition": {
+        "X": -1397.5,
+        "Y": -175.0
+      },
+      "guid": "eac00359-2f23-4eaa-8011-658abdd1486c",
+      "Title": "Start"
+    },
+    {
+      "$type": "XStoryline.FloatNode, XStorylineStandalone",
+      "data": 0.0,
+      "editorPosition": {
+        "X": -1647.0,
+        "Y": -34.0
+      },
+      "guid": "6a0f411d-2f80-4ce4-9dac-3dd85227fd79",
+      "Title": "Float"
+    },
+    {
+      "$type": "XStoryline.FloatNode, XStorylineStandalone",
+      "data": 1.0,
+      "editorPosition": {
+        "X": -1648.0,
+        "Y": 87.5
+      },
+      "guid": "ebe425e5-4470-492f-b55f-10889669ebd1",
+      "Title": "Float"
+    }
+  ],
+  "edges": [
+    {
+      "outputNodeGuid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "outputPortName": "True",
+      "inputNodeGuid": "ce7ae093-58e2-44bb-ac24-4d669be85daa",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "51cda31f-80e4-4354-9805-86217d073a19",
+      "outputPortName": "Output",
+      "inputNodeGuid": "ce7ae093-58e2-44bb-ac24-4d669be85daa",
+      "inputPortName": "Input"
+    },
+    {
+      "outputNodeGuid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "outputPortName": "False",
+      "inputNodeGuid": "990d162b-dc96-47e4-b38d-5aaea9b74aff",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "05d76a91-00f3-4589-a7f8-9a242f80e030",
+      "outputPortName": "Output",
+      "inputNodeGuid": "990d162b-dc96-47e4-b38d-5aaea9b74aff",
+      "inputPortName": "Input"
+    },
+    {
+      "outputNodeGuid": "eac00359-2f23-4eaa-8011-658abdd1486c",
+      "outputPortName": "Next",
+      "inputNodeGuid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "6a0f411d-2f80-4ce4-9dac-3dd85227fd79",
+      "outputPortName": "Output",
+      "inputNodeGuid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "inputPortName": "Input1"
+    },
+    {
+      "outputNodeGuid": "ebe425e5-4470-492f-b55f-10889669ebd1",
+      "outputPortName": "Output",
+      "inputNodeGuid": "7ea8f754-e095-4551-8fb4-192693923e5c",
+      "inputPortName": "Input2"
+    }
+  ],
+  "stickyNotes": []
+}

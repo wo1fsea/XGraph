@@ -8,6 +8,8 @@ namespace XGraph
     {
         private BaseGraphView _graphView;
         public BaseGraphView GraphView => _graphView;
+        
+        public string StyleSheetPath => "Node.uss";
 
         public static void ShowWindow()
         {
@@ -33,7 +35,6 @@ namespace XGraph
 
         private void ConstructGraphView()
         {
-
             _graphView = new BaseGraphView();
 
             _graphView.StretchToParentSize();
