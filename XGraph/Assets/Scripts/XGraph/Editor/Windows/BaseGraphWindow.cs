@@ -1,34 +1,39 @@
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
-using UnityEngine.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace XGraph
 {
-    public class GraphViewWindow : EditorWindow
+    public class BaseGraphViewWindow : EditorWindow
     {
         private BaseGraphView _graphView;
         public BaseGraphView GraphView => _graphView;
 
-        [MenuItem("XGraph/Show Window")]
         public static void ShowWindow()
         {
-            GraphViewWindow window = GetWindow<GraphViewWindow>();
+            BaseGraphViewWindow window = GetWindow<BaseGraphViewWindow>();
             window.titleContent = new GUIContent("GraphView Window");
         }
 
         private void OnEnable()
         {
             ConstructGraphView();
+            XGraphDebuger.OnDebugLogEvent += Debug.Log;
+            XGraphDebuger.OnDebugLogWarningEvent += Debug.LogWarning;
+            XGraphDebuger.OnDebugLogErrorEvent += Debug.LogError;
         }
 
         private void OnDisable()
         {
             rootVisualElement.Remove(_graphView);
+            XGraphDebuger.OnDebugLogEvent -= Debug.Log;
+            XGraphDebuger.OnDebugLogWarningEvent -= Debug.LogWarning;
+            XGraphDebuger.OnDebugLogErrorEvent -= Debug.LogError;
         }
 
         private void ConstructGraphView()
         {
+
             _graphView = new BaseGraphView();
 
             _graphView.StretchToParentSize();
@@ -65,6 +70,13 @@ namespace XGraph
             });
             loadButton.text = "Load";
             buttonContainer.Add(loadButton);
+            
+            Button runButton = new Button(() =>
+            {
+                _graphView.GraphData.Run();
+            });
+            runButton.text = "Run";
+            buttonContainer.Add(runButton);
 
             // 将按钮容器添加到窗口的根视觉元素
             rootVisualElement.Add(buttonContainer);

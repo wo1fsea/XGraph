@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Numerics;
 using XGraph;
 
 namespace XStoryline
 {
     [Serializable, NodeMenuItem("Data/Int")]
-    public class IntDataNode : DataNode<int> {}
-    
-    [Serializable, NodeMenuItem("Data/Long")]
-    public class LongDataNode: DataNode<long>{}
+    public class IntNode : DataNode<int> {}
     
     [Serializable, NodeMenuItem("Data/Float")]
-    public class FloatDataNode: DataNode<float>{}
+    public class FloatNode: DataNode<float>{}
     
-    [Serializable, NodeMenuItem("Data/Double")]
-    public class DoubleDataNode: DataNode<double>{}
-    
+    [Serializable, NodeMenuItem("Data/Vector2")]
+    public class Vector2Node: DataNode<Vector2>{}
+   
+    [Serializable, NodeMenuItem("Data/Vector3")]
+    public class Vector3Node: DataNode<Vector3>{}
 }

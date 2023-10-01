@@ -23,8 +23,8 @@ namespace XGraph
             // 监听位置变化事件
             RegisterCallback<GeometryChangedEvent>(evt =>
             {
-                _stickyNoteData.x = evt.newRect.x;
-                _stickyNoteData.y = evt.newRect.y;
+                _stickyNoteData.editorPosition.X = evt.newRect.x;
+                _stickyNoteData.editorPosition.Y = evt.newRect.y;
                 _stickyNoteData.width = evt.newRect.width;
                 _stickyNoteData.height = evt.newRect.height;
                 OnPositionChanged?.Invoke(evt.newRect.position);

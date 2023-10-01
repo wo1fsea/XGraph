@@ -21,6 +21,7 @@ namespace XGraph
 
         public void OnDropOutsidePort(Edge edge, Vector2 position)
         {
+            
         }
 
         public void OnDrop(GraphView graphView, Edge edge)
@@ -75,7 +76,6 @@ namespace XGraph
         public BasePortView(Orientation portOrientation, Direction portDirection, Capacity capacity,
             Type capacityType) : base(portOrientation, portDirection, capacity, capacityType)
         {
-            userData = true;
             Console.Out.WriteLine("BasePortView:" + capacityType);
             EdgeConnectorListener listener = new EdgeConnectorListener();
             m_EdgeConnector = new EdgeConnector<Edge>(listener);

@@ -1,4 +1,4 @@
-namespace XStoryline
+namespace XGraph 
 {
     public struct FlowLink {}
 }

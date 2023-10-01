@@ -167,8 +167,8 @@ namespace XGraph
                 evt.menu.AppendAction($"create/{nodeType.Item1}", (action) =>
                 {
                     BaseNodeData nodeData = System.Activator.CreateInstance(nodeType.Item2) as BaseNodeData;
-                    nodeData.x = mousePos.x;
-                    nodeData.y = mousePos.y;
+                    nodeData.editorPosition.X = mousePos.x;
+                    nodeData.editorPosition.Y = mousePos.y;
                     AddNode(nodeData);
                 });
             }
@@ -176,8 +176,8 @@ namespace XGraph
             evt.menu.AppendAction("create/StickyNote",  (action) =>
             {
                 StickyNoteData stickyNoteData = new StickyNoteData();
-                stickyNoteData.x = mousePos.x;
-                stickyNoteData.y = mousePos.y;
+                stickyNoteData.editorPosition.X = mousePos.x;
+                stickyNoteData.editorPosition.Y = mousePos.y;
                 AddStickyNote(stickyNoteData);
             });
         }
@@ -211,7 +211,7 @@ namespace XGraph
         public BaseNodeView CreateNode(BaseNodeData nodeData)
         {
             BaseNodeView node = new BaseNodeView(nodeData);
-            node.SetPosition(new Rect(new Vector2(nodeData.x, nodeData.y), Vector2.zero));
+            node.SetPosition(new Rect(new Vector2(nodeData.editorPosition.X, nodeData.editorPosition.Y), Vector2.zero));
             return node;
         }
 
@@ -239,7 +239,7 @@ namespace XGraph
         public StickyNoteView CreateStickyNote(StickyNoteData stickyNoteData)
         {
             StickyNoteView stickyNote = new StickyNoteView(stickyNoteData);
-            stickyNote.SetPosition(new Rect(new Vector2(stickyNoteData.x, stickyNoteData.y), new Vector2(stickyNoteData.width, stickyNoteData.height)));
+            stickyNote.SetPosition(new Rect(new Vector2(stickyNoteData.editorPosition.X, stickyNoteData.editorPosition.Y), new Vector2(stickyNoteData.width, stickyNoteData.height)));
             return stickyNote;
         }
     }

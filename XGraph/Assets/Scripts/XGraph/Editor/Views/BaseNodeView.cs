@@ -21,8 +21,8 @@ namespace XGraph
             // 监听位置变化事件
             RegisterCallback<GeometryChangedEvent>(evt =>
             {
-                _nodeData.x = evt.newRect.x;
-                _nodeData.y = evt.newRect.y;
+                _nodeData.editorPosition.X = evt.newRect.x;
+                _nodeData.editorPosition.Y = evt.newRect.y;
                 OnPositionChanged?.Invoke(evt.newRect.position);
             });
 
@@ -38,81 +38,12 @@ namespace XGraph
 
         private void HandleNodeDataAttributes(BaseNodeData nodeData)
         {
-            FieldInfo[] fields = nodeData.GetType()
-                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-            foreach (FieldInfo field in fields)
+            foreach (FieldInfo field in nodeData.GetFields())
             {
                 if (Attribute.GetCustomAttribute(field, typeof(PropertyAttribute)) is PropertyAttribute
                     propertyAttribute)
-                { 
-                    VisualElement baseField = null;
-                    var fieldType = field.FieldType;
-                
-                    // 检查字段类型并创建相应的输入字段
-                    if (fieldType == typeof(int))
-                    {
-                        var integerField = new IntegerField(propertyAttribute.name);
-                        integerField.SetValueWithoutNotify((int) field.GetValue(nodeData));
-                        integerField.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = integerField;
-                    }
-                    else if (fieldType == typeof(long))
-                    {
-                        var longField = new LongField(propertyAttribute.name);
-                        longField.SetValueWithoutNotify((long) field.GetValue(nodeData));
-                        longField.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = longField;
-                    }
-                    else if (fieldType == typeof(float))
-                    {
-                        var floatField = new FloatField(propertyAttribute.name);
-                        floatField.SetValueWithoutNotify((float) field.GetValue(nodeData));
-                        floatField.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = floatField;
-                    }
-                    else if (fieldType == typeof(double))
-                    {
-                        var floatField = new DoubleField(propertyAttribute.name);
-                        floatField.SetValueWithoutNotify((double) field.GetValue(nodeData));
-                        floatField.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = floatField;
-                    }
-                    else if (fieldType == typeof(string))
-                    {
-                        var textField = new TextField(propertyAttribute.name);
-                        textField.SetValueWithoutNotify((string) field.GetValue(nodeData));
-                        textField.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = textField;
-                
-                    }
-                    else if (fieldType == typeof(bool))
-                    {
-                        var toggle = new Toggle(propertyAttribute.name);
-                        toggle.SetValueWithoutNotify((bool) field.GetValue(nodeData));
-                        toggle.RegisterValueChangedCallback(evt =>
-                        {
-                            field.SetValue(nodeData, evt.newValue);
-                        });
-                        baseField = toggle;
-                        
-                    }
-                    // ... 其他类型
+                {
+                    var baseField = PropertyFieldGenerator.GeneratePropertyField(nodeData, field);
                 
                     if (baseField != null)
                     {

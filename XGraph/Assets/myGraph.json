@@ -1,0 +1,119 @@
+{
+  "graphName": "New Graph",
+  "nodes": [
+    {
+      "$type": "XStoryline.StartNode, XStorylineStandalone",
+      "editorPosition": {
+        "X": -448.0,
+        "Y": 91.5
+      },
+      "guid": "f163d1bb-7773-47a8-a0a2-a74afad9c2bb",
+      "Title": "Start"
+    },
+    {
+      "$type": "XStoryline.IntPrintNode, XStorylineStandalone",
+      "input": 0,
+      "onProcessFinished": null,
+      "editorPosition": {
+        "X": -275.5,
+        "Y": 64.0
+      },
+      "guid": "9ead20fe-b81b-4ab7-bc49-44fab9817b15",
+      "Title": "IntPrint"
+    },
+    {
+      "$type": "XStoryline.EndNode, XStorylineStandalone",
+      "editorPosition": {
+        "X": 399.0,
+        "Y": 276.0
+      },
+      "guid": "b8a77493-00d0-4cd5-b75a-14ddd7a74558",
+      "Title": "End"
+    },
+    {
+      "$type": "XStoryline.IntAddNode, XStorylineStandalone",
+      "input1": 0,
+      "input2": 0,
+      "output": 0,
+      "onProcessFinished": null,
+      "editorPosition": {
+        "X": 12.5,
+        "Y": 44.0
+      },
+      "guid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "Title": "IntAdd"
+    },
+    {
+      "$type": "XStoryline.IntNode, XStorylineStandalone",
+      "data": 100,
+      "editorPosition": {
+        "X": -323.5,
+        "Y": 310.0
+      },
+      "guid": "48ecbaf5-6182-44da-9e4e-7ea0d3588dba",
+      "Title": "Int"
+    },
+    {
+      "$type": "XStoryline.IntPrintNode, XStorylineStandalone",
+      "input": 0,
+      "onProcessFinished": null,
+      "editorPosition": {
+        "X": 49.0,
+        "Y": 394.5
+      },
+      "guid": "473a323a-ac9c-4af4-86ab-2613d2e67f5c",
+      "Title": "IntPrint"
+    }
+  ],
+  "edges": [
+    {
+      "outputNodeGuid": "f163d1bb-7773-47a8-a0a2-a74afad9c2bb",
+      "outputPortName": "Next",
+      "inputNodeGuid": "9ead20fe-b81b-4ab7-bc49-44fab9817b15",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "9ead20fe-b81b-4ab7-bc49-44fab9817b15",
+      "outputPortName": "Next",
+      "inputNodeGuid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "48ecbaf5-6182-44da-9e4e-7ea0d3588dba",
+      "outputPortName": "Output",
+      "inputNodeGuid": "9ead20fe-b81b-4ab7-bc49-44fab9817b15",
+      "inputPortName": "Input"
+    },
+    {
+      "outputNodeGuid": "48ecbaf5-6182-44da-9e4e-7ea0d3588dba",
+      "outputPortName": "Output",
+      "inputNodeGuid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "inputPortName": "Input2"
+    },
+    {
+      "outputNodeGuid": "48ecbaf5-6182-44da-9e4e-7ea0d3588dba",
+      "outputPortName": "Output",
+      "inputNodeGuid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "inputPortName": "Input1"
+    },
+    {
+      "outputNodeGuid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "outputPortName": "Next",
+      "inputNodeGuid": "473a323a-ac9c-4af4-86ab-2613d2e67f5c",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "473a323a-ac9c-4af4-86ab-2613d2e67f5c",
+      "outputPortName": "Next",
+      "inputNodeGuid": "b8a77493-00d0-4cd5-b75a-14ddd7a74558",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "40b51b28-c718-457c-8073-51a0eb7c5396",
+      "outputPortName": "Output",
+      "inputNodeGuid": "473a323a-ac9c-4af4-86ab-2613d2e67f5c",
+      "inputPortName": "Input"
+    }
+  ],
+  "stickyNotes": []
+}
