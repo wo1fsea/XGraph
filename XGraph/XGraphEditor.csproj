@@ -50,9 +50,8 @@
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/BasePortView.cs" />
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/PropertyFieldGenerator.cs" />
      <Folder Include="Assets/Scripts/XGraph/Editor/Windows" />
+     <Folder Include="Assets\Scripts\XGraph\Editor\Resources\" />
      <None Include="Assets/Scripts/XGraph/Editor/XGraphEditor.asmdef" />
-     <Folder Include="Assets/Scripts/XGraph/Editor" />
-     <Folder Include="Assets/Scripts/XGraph/Editor/Views" />
      <Reference Include="UnityEngine">
      <HintPath>/Applications/Unity/Hub/Editor/2021.3.23f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
      </Reference>
@@ -700,6 +699,10 @@
       <Project>{e3c4dbcc-abeb-f41e-74d0-bd23f7ce0aa7}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheet\Node.uss" />
+    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheet\StickyNote.uss" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

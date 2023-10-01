@@ -8,6 +8,8 @@ namespace XGraph
     {
         private BaseGraphView _graphView;
         public BaseGraphView GraphView => _graphView;
+        
+        public string StyleSheetPath => "Node.uss";
 
         public static void ShowWindow()
         {
@@ -18,6 +20,7 @@ namespace XGraph
         private void OnEnable()
         {
             ConstructGraphView();
+            
             XGraphDebuger.OnDebugLogEvent += Debug.Log;
             XGraphDebuger.OnDebugLogWarningEvent += Debug.LogWarning;
             XGraphDebuger.OnDebugLogErrorEvent += Debug.LogError;
@@ -26,6 +29,7 @@ namespace XGraph
         private void OnDisable()
         {
             rootVisualElement.Remove(_graphView);
+            
             XGraphDebuger.OnDebugLogEvent -= Debug.Log;
             XGraphDebuger.OnDebugLogWarningEvent -= Debug.LogWarning;
             XGraphDebuger.OnDebugLogErrorEvent -= Debug.LogError;
@@ -33,7 +37,6 @@ namespace XGraph
 
         private void ConstructGraphView()
         {
-
             _graphView = new BaseGraphView();
 
             _graphView.StretchToParentSize();
@@ -50,9 +53,11 @@ namespace XGraph
             // 创建保存按钮并添加到容器中
             Button saveButton = new Button(() =>
             {
-                string path = EditorUtility.SaveFilePanel("Save Graph", "Assets", "myGraph", "json");
+                string path = EditorUtility.SaveFilePanel("Save", "Assets", GraphView.GraphData.graphName, "json");
                 if (!string.IsNullOrEmpty(path))
                 {
+                    var graphName = System.IO.Path.GetFileNameWithoutExtension(path);
+                    GraphView.GraphData.graphName = graphName;
                     _graphView.SaveToFile(path);
                 }
             });

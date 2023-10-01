@@ -11,13 +11,15 @@ namespace XGraph
         private StickyNoteData _stickyNoteData;
         public StickyNoteData StickyNoteData => _stickyNoteData;
 
+        public string StyleSheetName => "StyleSheet/StickyNote";
+
         public event Action<Vector2> OnPositionChanged;
 
         public StickyNoteView(StickyNoteData nodeData)
         {
             fontSize = StickyNoteFontSize.Small;
             theme = StickyNoteTheme.Black;
-            
+
             _stickyNoteData = nodeData;
 
             // 监听位置变化事件
@@ -29,17 +31,20 @@ namespace XGraph
                 _stickyNoteData.height = evt.newRect.height;
                 OnPositionChanged?.Invoke(evt.newRect.position);
             });
-            
-            this.Q<TextField>("title-field").RegisterCallback<ChangeEvent<string>>(e => {
-                _stickyNoteData.title = e.newValue;
-            });
-            this.Q<TextField>("contents-field").RegisterCallback<ChangeEvent<string>>(e => {
+
+            this.Q<TextField>("title-field")
+                .RegisterCallback<ChangeEvent<string>>(e => { _stickyNoteData.title = e.newValue; });
+            this.Q<TextField>("contents-field").RegisterCallback<ChangeEvent<string>>(e =>
+            {
                 _stickyNoteData.content = e.newValue;
             });
 
             // 设置节点标题
             title = nodeData.title;
             contents = nodeData.content;
+
+            var styleSheet = Resources.Load<StyleSheet>(StyleSheetName);
+            styleSheets.Add(styleSheet);
         }
     }
 }

@@ -5,8 +5,6 @@ using System.Reflection;
 
 namespace XGraph
 {
-
-    
     [Serializable]
     public class BaseNodeData
     {
@@ -19,6 +17,13 @@ namespace XGraph
         public FieldInfo[] GetFields()
         {
             return GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        }
+        
+        public FieldInfo[] GetOrderedFields()
+        {
+            return GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).OrderBy(
+                field =>
+                    (field.GetCustomAttributes(typeof(XAttribute)).FirstOrDefault() as XAttribute)?.showOrder).ToArray();
         }
 
         public FieldInfo[] GetInputFields()
@@ -43,7 +48,7 @@ namespace XGraph
                         (field.GetCustomAttribute(typeof(InputAttribute)) as InputAttribute)?.name == portName);
             return fields.FirstOrDefault();
         }
-        
+
         public FieldInfo GetOutputFieldByPortName(String portName)
         {
             var fields = GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -68,6 +73,11 @@ namespace XGraph
         {
             return GetType().GetField(portName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                 ?.GetCustomAttribute(typeof(InputAttribute)) != null;
+        }
+        
+        public BaseNodeData Clone()
+        {
+            return MemberwiseClone() as BaseNodeData;
         }
     }
 

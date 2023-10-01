@@ -41,19 +41,17 @@
     <ImplicitlyExpandDesignTimeFacades>false</ImplicitlyExpandDesignTimeFacades>
   </PropertyGroup>
   <ItemGroup>
-     <Compile Include="Assets/Scripts/XGraph/Standalone/Models/Nodes/BaseNodes/DataNode.cs" />
      <Compile Include="Assets/Scripts/XGraph/Standalone/Models/BaseNodeData.cs" />
-     <Compile Include="Assets/Scripts/XGraph/Standalone/Models/Nodes/BaseNodes/FlowNode.cs" />
-     <Compile Include="Assets/Scripts/XGraph/Standalone/Models/Nodes/BaseNodes/FlowLink.cs" />
      <Compile Include="Assets/Scripts/XGraph/Standalone/Models/BaseEdgeData.cs" />
      <Compile Include="Assets/Scripts/XGraph/Standalone/Models/Attributes.cs" />
      <Compile Include="Assets/Scripts/XGraph/Standalone/PackageInfo.cs" />
      <Compile Include="Assets/Scripts/XGraph/Standalone/Models/BaseGraphData.cs" />
      <Compile Include="Assets\Scripts\XGraph\Standalone\Debuger.cs" />
-     <Folder Include="Assets/Scripts/XGraph/Standalone/Models/Nodes" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\Nodes\DataNode.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\Nodes\FlowLink.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\Nodes\FlowNode.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Standalone\Models\PortTypeConverter.cs" />
      <None Include="Assets/Scripts/XGraph/Standalone/XGraphStandalone.asmdef" />
-     <Folder Include="Assets/Scripts/XGraph/Standalone/Models/Nodes/BaseNodes" />
-     <Folder Include="Assets/Scripts/XGraph/Standalone/Models" />
      <Reference Include="UnityEngine">
      <HintPath>/Applications/Unity/Hub/Editor/2021.3.23f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
      </Reference>

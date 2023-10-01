@@ -5,47 +5,64 @@ namespace XGraph
     public class XAttribute : Attribute
     {
         public string name;
+        public string displayName;
         public bool multipleConnect;
-        protected XAttribute(string name, bool multipleConnect = false)
+        public int showOrder;
+
+        protected XAttribute(string name, string displayName = null, bool multipleConnect = false, int showOrder = 0)
         {
             this.name = name;
+            this.displayName = displayName ?? name;
             this.multipleConnect = multipleConnect;
+            this.showOrder = showOrder;
         }
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class InputAttribute : XAttribute
+    public sealed class InputAttribute : XAttribute
     {
-        public InputAttribute(string name, bool multipleConnect = false) : base(name, multipleConnect)
+        public InputAttribute(string name, string displayName = null, bool multipleConnect = false, int showOrder = 0) : base(name, displayName,
+            multipleConnect, showOrder)
         {
         }
     }
 
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class OutputAttribute : XAttribute
+    public sealed class OutputAttribute : XAttribute
     {
-        public OutputAttribute(string name, bool multipleConnect = true) : base(name, multipleConnect)
+        public OutputAttribute(string name, string displayName = null, bool multipleConnect = true, int showOrder = 0) : base(name, displayName,
+            multipleConnect, showOrder)
         {
-        }
-    } 
-    
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public class PropertyAttribute : Attribute
-    {
-        public string name;
-        public PropertyAttribute(string name)
-        {
-            this.name = name;
         }
     }
-    
+
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+    public sealed class PropertyAttribute : XAttribute
+    {
+        public PropertyAttribute(string name,string displayName = null, int showOrder = 0) : base(name, displayName, false, showOrder)
+        {
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class NodeMenuItemAttribute : Attribute
+    public sealed class NodeMenuItemAttribute : Attribute
     {
         public string name;
+
         public NodeMenuItemAttribute(string name)
         {
             this.name = name;
+        }
+    }
+    
+    [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
+    public sealed class EnumDescriptionAttribute : Attribute
+    {
+        public readonly string description;
+
+        public EnumDescriptionAttribute(string description)
+        {
+            this.description = description;
         }
     }
 }

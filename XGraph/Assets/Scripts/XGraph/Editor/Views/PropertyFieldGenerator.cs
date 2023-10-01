@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using UnityEditor.UIElements;
@@ -25,6 +26,7 @@ namespace XGraph
                 var integerField = new IntegerField(propertyAttribute.name);
                 integerField.SetValueWithoutNotify((int)field.GetValue(nodeData));
                 integerField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = integerField;
             }
             else if (fieldType == typeof(long))
@@ -32,6 +34,7 @@ namespace XGraph
                 var longField = new LongField(propertyAttribute.name);
                 longField.SetValueWithoutNotify((long)field.GetValue(nodeData));
                 longField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = longField;
             }
             else if (fieldType == typeof(float))
@@ -39,6 +42,7 @@ namespace XGraph
                 var floatField = new FloatField(propertyAttribute.name);
                 floatField.SetValueWithoutNotify((float)field.GetValue(nodeData));
                 floatField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = floatField;
             }
             else if (fieldType == typeof(double))
@@ -46,6 +50,7 @@ namespace XGraph
                 var floatField = new DoubleField(propertyAttribute.name);
                 floatField.SetValueWithoutNotify((double)field.GetValue(nodeData));
                 floatField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = floatField;
             }
             else if (fieldType == typeof(string))
@@ -53,6 +58,7 @@ namespace XGraph
                 var textField = new TextField(propertyAttribute.name);
                 textField.SetValueWithoutNotify((string)field.GetValue(nodeData));
                 textField.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = textField;
             }
             else if (fieldType == typeof(bool))
@@ -60,6 +66,7 @@ namespace XGraph
                 var toggle = new Toggle(propertyAttribute.name);
                 toggle.SetValueWithoutNotify((bool)field.GetValue(nodeData));
                 toggle.RegisterValueChangedCallback(evt => { field.SetValue(nodeData, evt.newValue); });
+                
                 baseField = toggle;
             }
             else if (fieldType == typeof(Vector2))
@@ -72,6 +79,7 @@ namespace XGraph
                 {
                     field.SetValue(nodeData, new Vector2(evt.newValue.x, evt.newValue.y));
                 });
+                
                 baseField = vector2Field;
             }
             else if (fieldType == typeof(Vector3))
@@ -84,9 +92,29 @@ namespace XGraph
                 {
                     field.SetValue(nodeData, new Vector3(evt.newValue.x, evt.newValue.y, evt.newValue.z));
                 });
+                
                 baseField = vector3Field;
             }
+            else if (fieldType.IsEnum)
+            {
+                var enumValues = Enum.GetValues(fieldType).Cast<Enum>().ToArray();
 
+                var descriptions = enumValues.Select(e =>
+                {
+                    FieldInfo valueField = e.GetType().GetField(e.ToString());
+                    EnumDescriptionAttribute attribute = valueField.GetCustomAttribute<EnumDescriptionAttribute>();
+                    return attribute != null ? attribute.description : e.ToString();
+                }).ToList();
+                var enumValue = (Enum)field.GetValue(nodeData);
+                var popupField = new PopupField<string>(propertyAttribute.name, descriptions, Array.IndexOf(Enum.GetValues(fieldType), enumValue));
+                popupField.RegisterValueChangedCallback(evt =>
+                {
+                    var index = descriptions.IndexOf(evt.newValue);
+                    field.SetValue(nodeData, enumValues.ElementAt(index));
+                });
+                
+                baseField = popupField;
+            }
 
             return baseField;
         }

@@ -4,6 +4,9 @@ using XGraph;
 
 namespace XStoryline
 {
+    [Serializable, NodeMenuItem("Data/Bool")]
+    public class BoolNode : DataNode<bool> {}
+    
     [Serializable, NodeMenuItem("Data/Int")]
     public class IntNode : DataNode<int> {}
     
