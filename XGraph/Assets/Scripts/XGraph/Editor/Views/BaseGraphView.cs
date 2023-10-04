@@ -4,14 +4,17 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.IO;
+using UnityEditor;
 using XGraph.Editor;
 
 namespace XGraph
 {
     public class BaseGraphView : GraphView
     {
-        private BaseGraphData _graphData;
-        public BaseGraphData GraphData => _graphData;
+        public BaseGraphData GraphData { get; private set; }
+        
+        public Label GraphNameLabel { get; private set; }
+        public string GraphDataFilePath { get; private set;}
 
         private Dictionary<string, BaseNodeView> nodeViews;
 
@@ -23,17 +26,48 @@ namespace XGraph
             this.AddManipulator(new ContextualMenuManipulator(OnContextMenuPopulate));
 
             SetupZoom(ContentZoomer.DefaultMinScale, ContentZoomer.DefaultMaxScale);
-
-            // 添加节点网格
-            var grid = new GridBackground();
-            grid.visible = true;
-            Insert(0, grid);
-            grid.StretchToParentSize();
-
+            
             graphViewChanged = OnGraphViewChanged;
 
-            _graphData = new BaseGraphData("New Graph");
+            GraphData = new BaseGraphData("New Graph");
             nodeViews = new Dictionary<string, BaseNodeView>();
+            
+            var labelContainer = new VisualElement
+            {
+                style =
+                {
+                    position = Position.Absolute,
+                    top = 10,
+                    left = 10,
+                    right = 10
+                }
+            };
+            Insert(0, labelContainer);
+
+            var grid = new GridBackground
+            {
+                visible = true,
+            };
+            Insert(0, grid);
+            
+            var stylesheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Scripts/XGraph/Editor/Resources/StyleSheets/GridBackground.uss");
+            if (stylesheet != null)
+            {
+                grid.styleSheets.Add(stylesheet);
+                grid.AddToClassList("grid-background");
+            }
+            
+            var graphNameLabel = new Label
+            {
+                style =
+                {
+                    unityTextAlign = TextAnchor.UpperLeft
+                }
+            };
+            labelContainer.Add(graphNameLabel);
+            
+            graphNameLabel.text = GraphData.graphName;
+            GraphNameLabel = graphNameLabel;
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
@@ -42,19 +76,19 @@ namespace XGraph
             {
                 foreach (var element in graphViewChange.elementsToRemove)
                 {
-                    if (element is BaseNodeView)
+                    if (element is BaseNodeView view)
                     {
-                        _graphData.nodes.Remove((element as BaseNodeView).NodeData);
+                        GraphData.nodes.Remove(view.NodeData);
                     }
                     
-                    if (element is BaseEdgeView)
+                    if (element is BaseEdgeView edgeView)
                     {
-                        _graphData.edges.Remove((element as BaseEdgeView).EdgeData);
+                        GraphData.edges.Remove(edgeView.EdgeData);
                     }
 
-                    if (element is StickyNoteView)
+                    if (element is StickyNoteView noteView)
                     {
-                        _graphData.stickyNotes.Remove((element as StickyNoteView).StickyNoteData);
+                        GraphData.stickyNotes.Remove(noteView.StickyNoteData);
                     }
                 }
             }
@@ -79,7 +113,7 @@ namespace XGraph
                         };
 
                         var baseEdgeView = CreateEdge(baseEdgeData);
-                        _graphData.edges.Add(baseEdgeData);
+                        GraphData.edges.Add(baseEdgeData);
                         edgesToCreate.Add(baseEdgeView);
                     }
                 }
@@ -92,7 +126,7 @@ namespace XGraph
 
         private void AddNode(BaseNodeData nodeData)
         {
-            _graphData.nodes.Add(nodeData);
+            GraphData.nodes.Add(nodeData);
             var node = CreateNode(nodeData);
             nodeViews[node.NodeData.guid] = node;
             AddElement(node);
@@ -100,36 +134,38 @@ namespace XGraph
         
         private void AddStickyNote(StickyNoteData stickyNoteData)
         {
-            _graphData.stickyNotes.Add(stickyNoteData);
+            GraphData.stickyNotes.Add(stickyNoteData);
             var stickyNote = CreateStickyNote(stickyNoteData);
             AddElement(stickyNote);
         }
 
         private void AddEdge(BaseEdgeData baseEdgeData)
         {
-            _graphData.edges.Add(baseEdgeData);
+            GraphData.edges.Add(baseEdgeData);
             var edge = CreateEdge(baseEdgeData);
             AddElement(edge);
         }
 
         private void RefreshGraphView()
         {
+            GraphNameLabel.text = GraphData.graphName;
+            
             DeleteElements(graphElements.ToList());
 
-            foreach (var nodeData in _graphData.nodes)
+            foreach (var nodeData in GraphData.nodes)
             {
                 var node = CreateNode(nodeData);
                 AddElement(node);
                 nodeViews[node.NodeData.guid] = node;
             }
 
-            foreach (var edgeData in _graphData.edges)
+            foreach (var edgeData in GraphData.edges)
             {
                 var edge = CreateEdge(edgeData);
                 AddElement(edge);
             }
 
-            foreach (var stickyNodeData in _graphData.stickyNotes)
+            foreach (var stickyNodeData in GraphData.stickyNotes)
             {
                 var stickNote = CreateStickyNote(stickyNodeData);
                 AddElement(stickNote);
@@ -157,7 +193,7 @@ namespace XGraph
             var mousePos =
                 (evt.currentTarget as VisualElement).ChangeCoordinatesTo(contentViewContainer, evt.localMousePosition);
 
-            var nodeTypes = NodeProvider.GetCompatibleNodes(_graphData);
+            var nodeTypes = NodeProvider.GetCompatibleNodes(GraphData);
 
             foreach (var nodeType in nodeTypes)
             {
@@ -181,17 +217,18 @@ namespace XGraph
 
         public void SaveToFile(string filepath)
         {
-            File.WriteAllText(filepath, _graphData.ToJson());
+            File.WriteAllText(filepath, GraphData.ToJson());
+            RefreshGraphView();
         }
 
         public void LoadFromFile(string filepath)
         {
             // Read the file
             string jsonData = File.ReadAllText(filepath);
-            _graphData = BaseGraphData.CreateFromJson(jsonData);
+            GraphData = BaseGraphData.CreateFromJson(jsonData);
             RefreshGraphView();
         }
-
+        
         private Port FindPortByName(VisualElement container, string portName)
         {
             foreach (var child in container.Children())
@@ -248,6 +285,59 @@ namespace XGraph
                        || (startPort.direction == Direction.Input && endPort.direction == Direction.Output &&
                            startPort.portType.IsAssignableFrom(endPort.portType))
                         || PortTypeConverter.CanConvert(startPort.portType, endPort.portType));
+        }
+        
+                
+        public void OnNew()
+        {
+            GraphData = new BaseGraphData("New Graph");
+            RefreshGraphView();
+        }
+        
+        public void OnSave()
+        {
+            if (string.IsNullOrEmpty(GraphDataFilePath))
+            {
+                OnSaveAs();
+            }
+            else
+            {
+                SaveToFile(GraphDataFilePath);
+            }
+        }
+
+        public void OnSaveAs()
+        {
+            var directory = "Assets";
+            if (!string.IsNullOrEmpty(GraphDataFilePath))
+            {
+                directory = Path.GetDirectoryName(GraphDataFilePath);
+            }
+
+            var path = EditorUtility.SaveFilePanel("Save Graph", directory, GraphData.graphName, "json");
+            if (!string.IsNullOrEmpty(path))
+            {
+                GraphDataFilePath = path;
+                GraphData.graphName = Path.GetFileNameWithoutExtension(path);
+                SaveToFile(path);
+            }
+        }
+        
+        public void OnLoad()
+        {
+            var directory = "Assets";
+            if (!string.IsNullOrEmpty(GraphDataFilePath))
+            {
+                directory = Path.GetDirectoryName(GraphDataFilePath);
+            }
+
+            var path = EditorUtility.OpenFilePanel("Select Graph file", directory, "json");
+            if (!string.IsNullOrEmpty(path))
+            {
+                LoadFromFile(path);
+                GraphDataFilePath = path;
+                GraphData.graphName = Path.GetFileNameWithoutExtension(path);
+            }
         }
     }
 }

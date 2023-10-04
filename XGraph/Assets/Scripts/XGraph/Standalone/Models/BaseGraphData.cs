@@ -36,7 +36,7 @@ namespace XGraph
             });
         }
 
-        public void Run()
+        public virtual void Run()
         {
             var runtimeData = BaseGraphRuntimeData.ConstructFromGraphData(this);
             runtimeData.ProcessFlow();
@@ -57,7 +57,7 @@ namespace XGraph
             BaseGraphRuntimeData runtimeData = new BaseGraphRuntimeData();
             foreach (var nodeData in graphData.nodes)
             {
-                var copiedNodeData = nodeData.Clone();
+                var copiedNodeData = nodeData.Clone(runtimeData);
                 runtimeData.nodes.Add(copiedNodeData.guid, copiedNodeData);
 
                 if (copiedNodeData is StartFlowNode flowNode)

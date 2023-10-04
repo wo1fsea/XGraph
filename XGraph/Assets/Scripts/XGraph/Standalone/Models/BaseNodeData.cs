@@ -10,6 +10,10 @@ namespace XGraph
     {
         // for editor
         public Vector2 editorPosition;
+        
+        // for runtime
+        [NonSerialized]
+        public BaseGraphRuntimeData runtimeContext;
 
         public string guid = Guid.NewGuid().ToString();
         public virtual string Title => GetType().ToString().Split(".")[^1].Replace("Node", "");
@@ -75,9 +79,12 @@ namespace XGraph
                 ?.GetCustomAttribute(typeof(InputAttribute)) != null;
         }
         
-        public BaseNodeData Clone()
+        public BaseNodeData Clone(BaseGraphRuntimeData runtimeData)
         {
-            return MemberwiseClone() as BaseNodeData;
+            var data = MemberwiseClone() as BaseNodeData;
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            data.runtimeContext = runtimeData;
+            return data;
         }
     }
 

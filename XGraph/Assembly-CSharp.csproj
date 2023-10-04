@@ -57,7 +57,6 @@
      <None Include="Library/PackageCache/com.unity.modules.tilemap@1.0.0/package.json" />
      <Folder Include="Library/PackageCache/com.unity.modules.assetbundle@1.0.0" />
      <Folder Include="Assets/Scenes" />
-     <None Include="Assets/myGraph.json" />
      <None Include="Library/PackageCache/com.unity.modules.terrainphysics@1.0.0/package.json" />
      <Folder Include="Assets/Scripts/XUI" />
      <Folder Include="Library/PackageCache/com.unity.modules.screencapture@1.0.0" />

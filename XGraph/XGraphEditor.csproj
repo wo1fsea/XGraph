@@ -701,8 +701,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheet\Node.uss" />
-    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheet\StickyNote.uss" />
+    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheets\GridBackground.uss" />
+    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheets\Node.uss" />
+    <Content Include="Assets\Scripts\XGraph\Editor\Resources\StyleSheets\StickyNote.uss" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

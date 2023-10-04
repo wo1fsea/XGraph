@@ -2,7 +2,8 @@
     "name": "XStorylineEditor",
     "rootNamespace": "",
     "references": [
-        "XGraphEditor"
+        "XGraphEditor",
+        "XGraphStandalone"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

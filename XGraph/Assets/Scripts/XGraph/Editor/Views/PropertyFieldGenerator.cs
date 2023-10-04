@@ -102,7 +102,7 @@ namespace XGraph
                 var descriptions = enumValues.Select(e =>
                 {
                     FieldInfo valueField = e.GetType().GetField(e.ToString());
-                    EnumDescriptionAttribute attribute = valueField.GetCustomAttribute<EnumDescriptionAttribute>();
+                    EnumDisplayNameAttribute attribute = valueField.GetCustomAttribute<EnumDisplayNameAttribute>();
                     return attribute != null ? attribute.description : e.ToString();
                 }).ToList();
                 var enumValue = (Enum)field.GetValue(nodeData);

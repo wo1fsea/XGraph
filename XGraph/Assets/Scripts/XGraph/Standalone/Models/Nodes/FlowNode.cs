@@ -43,7 +43,8 @@ namespace XGraph
         {
             onProcessFinished.Invoke(this);
         }
-
+        
+        [NonSerialized]
         public Action<ProcessFlowNode> onProcessFinished;
     }
 
@@ -72,6 +73,4 @@ namespace XGraph
             return condition ? GetPortKey("True") : GetPortKey("False");
         }
     }
-    
-    
 }

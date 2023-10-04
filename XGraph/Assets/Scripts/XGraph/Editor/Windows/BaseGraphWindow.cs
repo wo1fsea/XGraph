@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -6,11 +8,27 @@ namespace XGraph
 {
     public class BaseGraphViewWindow : EditorWindow
     {
-        private BaseGraphView _graphView;
-        public BaseGraphView GraphView => _graphView;
+        public BaseGraphView GraphView { get; private set; }
         
-        public string StyleSheetPath => "Node.uss";
-
+        public VisualElement MainContainer { get; private set; }
+        public VisualElement ToolbarContainer { get; private set; }
+        
+        public Label GraphNameLabel { get; private set; }
+        
+        public BaseGraphViewWindow()
+        {
+            XGraphDebuger.OnDebugLogEvent += Debug.Log;
+            XGraphDebuger.OnDebugLogWarningEvent += Debug.LogWarning;
+            XGraphDebuger.OnDebugLogErrorEvent += Debug.LogError;
+        }
+        
+        private void OnDestroy()
+        {
+            XGraphDebuger.OnDebugLogEvent -= Debug.Log;
+            XGraphDebuger.OnDebugLogWarningEvent -= Debug.LogWarning;
+            XGraphDebuger.OnDebugLogErrorEvent -= Debug.LogError; 
+        }
+        
         public static void ShowWindow()
         {
             BaseGraphViewWindow window = GetWindow<BaseGraphViewWindow>();
@@ -20,71 +38,68 @@ namespace XGraph
         private void OnEnable()
         {
             ConstructGraphView();
-            
-            XGraphDebuger.OnDebugLogEvent += Debug.Log;
-            XGraphDebuger.OnDebugLogWarningEvent += Debug.LogWarning;
-            XGraphDebuger.OnDebugLogErrorEvent += Debug.LogError;
         }
 
-        private void OnDisable()
+        public virtual BaseGraphView SetupGraphView()
         {
-            rootVisualElement.Remove(_graphView);
-            
-            XGraphDebuger.OnDebugLogEvent -= Debug.Log;
-            XGraphDebuger.OnDebugLogWarningEvent -= Debug.LogWarning;
-            XGraphDebuger.OnDebugLogErrorEvent -= Debug.LogError;
+            return new BaseGraphView();
+        }
+        
+        public virtual VisualElement SetupMainContainer()
+        {
+            var mainContainer = new VisualElement();
+            mainContainer.StretchToParentSize();
+            mainContainer.style.flexDirection = FlexDirection.Column;
+            return mainContainer;
+        }
+        
+        public virtual VisualElement SetupToolbarContainer()
+        {
+            var toolbarContainer = new VisualElement();
+            toolbarContainer.style.flexDirection = FlexDirection.Row;
+            toolbarContainer.style.paddingTop = 5;
+            toolbarContainer.style.paddingLeft = 5;
+            toolbarContainer.style.paddingRight = 5;
+            toolbarContainer.style.paddingBottom = 5;
+            toolbarContainer.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f);
+            toolbarContainer.style.alignItems = Align.Center; 
+            return toolbarContainer;
+        }
+
+        protected virtual List<Tuple<string, Action>> GetToolbarButtons()
+        {
+            return new List<Tuple<string, Action>>();
         }
 
         private void ConstructGraphView()
         {
-            _graphView = new BaseGraphView();
-
-            _graphView.StretchToParentSize();
-            // 将GraphView添加到窗口的根视觉元素
-            rootVisualElement.Add(_graphView); 
+            GraphView = SetupGraphView();
+            GraphView.style.flexGrow = 1;
+            GraphView.style.flexShrink = 0;
             
-            // 创建一个容器来包含按钮
-            var buttonContainer = new VisualElement();
-            buttonContainer.style.flexDirection = FlexDirection.Row;
-            buttonContainer.style.paddingTop = 5;
-            buttonContainer.style.paddingLeft = 5;
-            buttonContainer.style.paddingRight = 5;
+            MainContainer = SetupMainContainer();
+            ToolbarContainer = SetupToolbarContainer();
 
-            // 创建保存按钮并添加到容器中
-            Button saveButton = new Button(() =>
-            {
-                string path = EditorUtility.SaveFilePanel("Save", "Assets", GraphView.GraphData.graphName, "json");
-                if (!string.IsNullOrEmpty(path))
-                {
-                    var graphName = System.IO.Path.GetFileNameWithoutExtension(path);
-                    GraphView.GraphData.graphName = graphName;
-                    _graphView.SaveToFile(path);
-                }
-            });
-            saveButton.text = "Save";
-            buttonContainer.Add(saveButton);
-
-            // 创建加载按钮并添加到容器中
-            Button loadButton = new Button(() =>
-            {
-                string path = EditorUtility.OpenFilePanel("Select Graph file", "Assets", "json");
-                if (!string.IsNullOrEmpty(path))
-                {
-                    _graphView.LoadFromFile(path);
-                }
-            });
-            loadButton.text = "Load";
-            buttonContainer.Add(loadButton);
+            rootVisualElement.Add(MainContainer);
+            MainContainer.Add(ToolbarContainer);
+            MainContainer.Add(GraphView);
             
-            Button runButton = new Button(() =>
+            var toolbarButtons = GetToolbarButtons();
+            foreach (var toolbarButton in toolbarButtons)
             {
-                _graphView.GraphData.Run();
-            });
-            runButton.text = "Run";
-            buttonContainer.Add(runButton);
+                Button button = new Button(toolbarButton.Item2)
+                {
+                    text = toolbarButton.Item1
+                };
+                ToolbarContainer.Add(button);
+            }
+            
+            var flexibleSpace = new VisualElement();
+            flexibleSpace.style.flexGrow = 1;
+            ToolbarContainer.Add(flexibleSpace);
 
-            // 将按钮容器添加到窗口的根视觉元素
-            rootVisualElement.Add(buttonContainer);
+            GraphNameLabel = new Label();
+            ToolbarContainer.Add(GraphNameLabel);
         }
     }
 }

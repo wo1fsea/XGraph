@@ -34,17 +34,17 @@ namespace XStoryline
   
     public enum CompareType 
     {
-        [EnumDescription("==")]
+        [EnumDisplayName("==")]
         Equal,
-        [EnumDescription("!=")]
+        [EnumDisplayName("!=")]
         NotEqual,
-        [EnumDescription(">")]
+        [EnumDisplayName(">")]
         Greater,
-        [EnumDescription("<")]
+        [EnumDisplayName("<")]
         Less,
-        [EnumDescription(">=")]
+        [EnumDisplayName(">=")]
         GreaterOrEqual,
-        [EnumDescription("<=")]
+        [EnumDisplayName("<=")]
         LessOrEqual
     }
     [Serializable, NodeMenuItem("Test/Compare")]

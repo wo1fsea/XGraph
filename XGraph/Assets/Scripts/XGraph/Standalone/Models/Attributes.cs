@@ -56,11 +56,11 @@ namespace XGraph
     }
     
     [AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-    public sealed class EnumDescriptionAttribute : Attribute
+    public sealed class EnumDisplayNameAttribute : Attribute
     {
         public readonly string description;
 
-        public EnumDescriptionAttribute(string description)
+        public EnumDisplayNameAttribute(string description)
         {
             this.description = description;
         }

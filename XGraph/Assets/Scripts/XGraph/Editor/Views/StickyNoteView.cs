@@ -11,7 +11,7 @@ namespace XGraph
         private StickyNoteData _stickyNoteData;
         public StickyNoteData StickyNoteData => _stickyNoteData;
 
-        public string StyleSheetName => "StyleSheet/StickyNote";
+        public string StyleSheetName => "StyleSheets/StickyNote";
 
         public event Action<Vector2> OnPositionChanged;
 
@@ -43,8 +43,8 @@ namespace XGraph
             title = nodeData.title;
             contents = nodeData.content;
 
-            var styleSheet = Resources.Load<StyleSheet>(StyleSheetName);
-            styleSheets.Add(styleSheet);
+            // var styleSheet = Resources.Load<StyleSheet>(StyleSheetName);
+            // styleSheets.Add(styleSheet);
         }
     }
 }
