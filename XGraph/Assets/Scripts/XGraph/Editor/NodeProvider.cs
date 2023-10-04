@@ -1,55 +1,37 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using UnityEngine.UIElements;
 
 namespace XGraph.Editor
 {
     public static class NodeProvider
     {
-        private static List<Type> _nodeTypes = new List<Type>();
+        private static List<Type> _nodeTypes = new();
 
         static NodeProvider()
         {
             BuildNodeCache();
         }
 
-        static void BuildNodeCache()
+        private static void BuildNodeCache()
         {
-            foreach (var nodeType in TypeCache.GetTypesDerivedFrom<BaseNodeData>())
+            foreach (var nodeType in TypeCache.GetTypesDerivedFrom<BaseNodeData>().Where(IsNodeAccessibleFromMenu))
             {
-                if (!IsNodeAccessibleFromMenu(nodeType))
-                    continue;
-                
                 _nodeTypes.Add(nodeType);
             }
         }
 
-        static bool IsNodeAccessibleFromMenu(Type nodeType)
+        private static bool IsNodeAccessibleFromMenu(Type nodeType)
         {
             var nodeAttribute = nodeType.GetCustomAttribute<NodeMenuItemAttribute>();
-
-            if (nodeAttribute == null)
-            {
-                return false;
-            }
-
-            return true;
+            return nodeAttribute != null;
         }
         
         public static List<Tuple<string, Type>> GetCompatibleNodes(BaseGraphData graphData)
         {
-            var menu = new List<Tuple<string, Type>>();
-            
-            foreach (var nodeType in _nodeTypes)
-            {
-                var nodeAttribute = nodeType.GetCustomAttribute<NodeMenuItemAttribute>();
-                menu.Add(new Tuple<string, Type>(nodeAttribute.name, nodeType));
-            }
-            
-            return menu;
+            return (from nodeType in _nodeTypes let nodeAttribute = nodeType.GetCustomAttribute<NodeMenuItemAttribute>() select new Tuple<string, Type>(nodeAttribute.name, nodeType)).ToList();
         }
     }
 }

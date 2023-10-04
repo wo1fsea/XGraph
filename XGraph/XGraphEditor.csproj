@@ -49,6 +49,7 @@
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/BaseGraphView.cs" />
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/BasePortView.cs" />
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/PropertyFieldGenerator.cs" />
+     <Compile Include="Assets\Scripts\XGraph\Editor\StyleProvider.cs" />
      <Folder Include="Assets/Scripts/XGraph/Editor/Windows" />
      <Folder Include="Assets\Scripts\XGraph\Editor\Resources\" />
      <None Include="Assets/Scripts/XGraph/Editor/XGraphEditor.asmdef" />

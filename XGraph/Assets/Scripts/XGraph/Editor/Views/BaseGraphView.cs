@@ -49,13 +49,7 @@ namespace XGraph
                 visible = true,
             };
             Insert(0, grid);
-            
-            var stylesheet = Resources.Load<StyleSheet>("StyleSheets/GridBackground");
-            if (stylesheet != null)
-            {
-                grid.styleSheets.Add(stylesheet);
-                grid.AddToClassList("grid-background");
-            }
+            StyleProvider.SetupStyle(grid, "grid-background"); 
             
             var graphNameLabel = new Label
             {
