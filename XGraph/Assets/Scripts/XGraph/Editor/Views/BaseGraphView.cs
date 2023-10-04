@@ -50,7 +50,7 @@ namespace XGraph
             };
             Insert(0, grid);
             
-            var stylesheet = AssetDatabase.LoadAssetAtPath<StyleSheet>("Assets/Scripts/XGraph/Editor/Resources/StyleSheets/GridBackground.uss");
+            var stylesheet = Resources.Load<StyleSheet>("StyleSheets/GridBackground");
             if (stylesheet != null)
             {
                 grid.styleSheets.Add(stylesheet);
@@ -78,17 +78,17 @@ namespace XGraph
                 {
                     if (element is BaseNodeView view)
                     {
-                        GraphData.nodes.Remove(view.NodeData);
+                        GraphData?.nodes.Remove(view.NodeData);
                     }
                     
                     if (element is BaseEdgeView edgeView)
                     {
-                        GraphData.edges.Remove(edgeView.EdgeData);
+                        GraphData?.edges.Remove(edgeView.EdgeData);
                     }
 
                     if (element is StickyNoteView noteView)
                     {
-                        GraphData.stickyNotes.Remove(noteView.StickyNoteData);
+                        GraphData?.stickyNotes.Remove(noteView.StickyNoteData);
                     }
                 }
             }
@@ -112,8 +112,8 @@ namespace XGraph
                             outputPortName = edge.output.portName
                         };
 
+                        GraphData?.edges.Add(baseEdgeData);
                         var baseEdgeView = CreateEdge(baseEdgeData);
-                        GraphData.edges.Add(baseEdgeData);
                         edgesToCreate.Add(baseEdgeView);
                     }
                 }
@@ -146,12 +146,15 @@ namespace XGraph
             AddElement(edge);
         }
 
-        private void RefreshGraphView()
+        private void RefreshGraphView(BaseGraphData graphData)
         {
-            GraphNameLabel.text = GraphData.graphName;
             
             DeleteElements(graphElements.ToList());
+            nodeViews.Clear();
 
+            GraphData = graphData;
+            GraphNameLabel.text = GraphData.graphName;
+            
             foreach (var nodeData in GraphData.nodes)
             {
                 var node = CreateNode(nodeData);
@@ -218,15 +221,15 @@ namespace XGraph
         public void SaveToFile(string filepath)
         {
             File.WriteAllText(filepath, GraphData.ToJson());
-            RefreshGraphView();
+            var graphData = GraphData;
+            GraphData = null;
+            RefreshGraphView(graphData);
         }
 
         public void LoadFromFile(string filepath)
         {
-            // Read the file
             string jsonData = File.ReadAllText(filepath);
-            GraphData = BaseGraphData.CreateFromJson(jsonData);
-            RefreshGraphView();
+            RefreshGraphView(BaseGraphData.CreateFromJson(jsonData));
         }
         
         private Port FindPortByName(VisualElement container, string portName)
@@ -290,8 +293,7 @@ namespace XGraph
                 
         public void OnNew()
         {
-            GraphData = new BaseGraphData("New Graph");
-            RefreshGraphView();
+            RefreshGraphView(new BaseGraphData("New Graph"));
         }
         
         public void OnSave()

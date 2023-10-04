@@ -18,4 +18,7 @@ namespace XStoryline
    
     [Serializable, NodeMenuItem("Data/Vector3")]
     public class Vector3Node: DataNode<Vector3>{}
+    
+    [Serializable, NodeMenuItem("Data/String")]
+    public class StringNode: DataNode<string>{}
 }

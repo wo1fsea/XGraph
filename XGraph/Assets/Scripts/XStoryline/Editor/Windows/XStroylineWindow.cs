@@ -12,7 +12,7 @@ namespace XStoryline
         public new static void ShowWindow()
         {
             BaseGraphViewWindow window = GetWindow<XStroylineWindow>();
-            window.titleContent = new GUIContent("XStoryline Window");
+            window.titleContent = new GUIContent("XStoryline");
         }
 
         protected override List<Tuple<string, Action>> GetToolbarButtons()
@@ -25,8 +25,9 @@ namespace XStoryline
             return new List<Tuple<string, Action>>()
             {
                 new ("New", GraphView.OnNew),
-                new ("Save", GraphView.OnSave),
                 new ("Load", GraphView.OnLoad),
+                new ("Save", GraphView.OnSave),
+                new ("Save As...", GraphView.OnSaveAs),
                 new ("Run", RunGraph),
             };
         }

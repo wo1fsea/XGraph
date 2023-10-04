@@ -1,0 +1,89 @@
+{
+  "graphName": "Test0",
+  "nodes": [
+    {
+      "$type": "XStoryline.BoolNode, XStorylineStandalone",
+      "data": true,
+      "editorPosition": {
+        "X": 81.5,
+        "Y": 85.0
+      },
+      "guid": "0d55dfcb-c87e-4038-b4d8-0931568fcac7",
+      "Title": "Bool"
+    },
+    {
+      "$type": "XStoryline.DebugPrintNode, XStorylineStandalone",
+      "input": null,
+      "editorPosition": {
+        "X": 696.5,
+        "Y": 81.0
+      },
+      "guid": "d4076971-4a0e-43a2-b538-c52acb33e690",
+      "Title": "DebugPrint"
+    },
+    {
+      "$type": "XStoryline.StartNode, XStorylineStandalone",
+      "editorPosition": {
+        "X": 81.5,
+        "Y": -2.5
+      },
+      "guid": "ca35727d-9029-4724-9f65-f48cb0b959b1",
+      "Title": "Start"
+    },
+    {
+      "$type": "XStoryline.AddNode, XStorylineStandalone",
+      "input1": 0.0,
+      "input2": 0.0,
+      "output": 0.0,
+      "editorPosition": {
+        "X": 477.5,
+        "Y": 92.5
+      },
+      "guid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "Title": "Add"
+    },
+    {
+      "$type": "XStoryline.FloatNode, XStorylineStandalone",
+      "data": 3.0,
+      "editorPosition": {
+        "X": 170.0,
+        "Y": 202.5
+      },
+      "guid": "572dc924-6425-43d2-b7f7-539bc4db4073",
+      "Title": "Float"
+    }
+  ],
+  "edges": [
+    {
+      "outputNodeGuid": "0d55dfcb-c87e-4038-b4d8-0931568fcac7",
+      "outputPortName": "Output",
+      "inputNodeGuid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "inputPortName": "Input1"
+    },
+    {
+      "outputNodeGuid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "outputPortName": "Output",
+      "inputNodeGuid": "d4076971-4a0e-43a2-b538-c52acb33e690",
+      "inputPortName": "Message"
+    },
+    {
+      "outputNodeGuid": "ca35727d-9029-4724-9f65-f48cb0b959b1",
+      "outputPortName": "Next",
+      "inputNodeGuid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "outputPortName": "Next",
+      "inputNodeGuid": "d4076971-4a0e-43a2-b538-c52acb33e690",
+      "inputPortName": "Previous"
+    },
+    {
+      "outputNodeGuid": "572dc924-6425-43d2-b7f7-539bc4db4073",
+      "outputPortName": "Output",
+      "inputNodeGuid": "74d3f524-58a9-4f34-a9d9-ffb4d455fe43",
+      "inputPortName": "Input2"
+    }
+  ],
+  "stickyNotes": []
+}

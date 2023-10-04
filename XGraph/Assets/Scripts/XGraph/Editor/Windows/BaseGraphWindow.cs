@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEditor.UIElements;
 
 namespace XGraph
 {
@@ -55,14 +56,19 @@ namespace XGraph
         
         public virtual VisualElement SetupToolbarContainer()
         {
-            var toolbarContainer = new VisualElement();
-            toolbarContainer.style.flexDirection = FlexDirection.Row;
-            toolbarContainer.style.paddingTop = 5;
-            toolbarContainer.style.paddingLeft = 5;
-            toolbarContainer.style.paddingRight = 5;
-            toolbarContainer.style.paddingBottom = 5;
-            toolbarContainer.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f);
-            toolbarContainer.style.alignItems = Align.Center; 
+            var toolbarContainer = new VisualElement
+            {
+                style =
+                {
+                    flexDirection = FlexDirection.Row,
+                    paddingTop = 5,
+                    paddingLeft = 5,
+                    paddingRight = 5,
+                    paddingBottom = 5,
+                    backgroundColor = new Color(0.2f, 0.2f, 0.2f),
+                    alignItems = Align.Center
+                }
+            };
             return toolbarContainer;
         }
 
@@ -94,12 +100,18 @@ namespace XGraph
                 ToolbarContainer.Add(button);
             }
             
-            var flexibleSpace = new VisualElement();
-            flexibleSpace.style.flexGrow = 1;
+            var flexibleSpace = new VisualElement
+            {
+                style =
+                {
+                    flexGrow = 1
+                }
+            };
             ToolbarContainer.Add(flexibleSpace);
 
             GraphNameLabel = new Label();
             ToolbarContainer.Add(GraphNameLabel);
         }
+        
     }
 }
