@@ -33,7 +33,7 @@ namespace XGraph
         public static void ShowWindow()
         {
             BaseGraphViewWindow window = GetWindow<BaseGraphViewWindow>();
-            window.titleContent = new GUIContent("GraphView Window");
+            window.titleContent = new GUIContent("XGraph");
         }
 
         private void OnEnable()
