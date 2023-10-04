@@ -103,7 +103,7 @@ namespace XGraph
                 {
                     FieldInfo valueField = e.GetType().GetField(e.ToString());
                     EnumDisplayNameAttribute attribute = valueField.GetCustomAttribute<EnumDisplayNameAttribute>();
-                    return attribute != null ? attribute.description : e.ToString();
+                    return attribute != null ? attribute.displayName : e.ToString();
                 }).ToList();
                 var enumValue = (Enum)field.GetValue(nodeData);
                 var popupField = new PopupField<string>(propertyAttribute.name, descriptions, Array.IndexOf(Enum.GetValues(fieldType), enumValue));
