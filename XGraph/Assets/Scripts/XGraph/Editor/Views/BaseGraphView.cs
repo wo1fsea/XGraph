@@ -12,6 +12,7 @@ namespace XGraph
     public class BaseGraphView : GraphView
     {
         public BaseGraphData GraphData { get; private set; }
+        public MiniMap MiniMap { get; private set; }
         
         public Label GraphNameLabel { get; private set; }
         public string GraphDataFilePath { get; private set;}
@@ -59,9 +60,36 @@ namespace XGraph
                 }
             };
             labelContainer.Add(graphNameLabel);
+
+            MiniMap = new MiniMap()
+            {
+                maxWidth = 150,
+                maxHeight = 75,
+                anchored = true,
+            };
+            UpdateMiniMapPosition();
+            RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
+            Add(MiniMap);
             
             graphNameLabel.text = GraphData.graphName;
             GraphNameLabel = graphNameLabel;
+        }
+
+        private void OnGeometryChanged(GeometryChangedEvent evt)
+        {
+            UpdateMiniMapPosition();
+        }
+
+        private void UpdateMiniMapPosition()
+        {
+            var parentWidth = layout.width;
+            var parentHeight = layout.height;
+            var miniMapWidth = MiniMap.maxWidth;
+            var miniMapHeight = MiniMap.maxHeight;
+            var miniMapX = parentWidth - miniMapWidth - 10;  // 10 is the margin from the right
+            var miniMapY = parentHeight - miniMapHeight - 10;  // 10 is the margin from the bottom
+
+            MiniMap.SetPosition(new Rect(miniMapX, miniMapY, miniMapWidth, miniMapHeight));
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
