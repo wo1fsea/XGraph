@@ -10,7 +10,7 @@ namespace XGraph
     public static class PropertyFieldGenerator
     {
         // static
-        public static VisualElement GeneratePropertyField(BaseNodeData nodeData, FieldInfo field)
+        public static VisualElement GenerateNodePropertyField(BaseNodeData nodeData, FieldInfo field)
         {
             var propertyAttribute =
                 Attribute.GetCustomAttribute(field, typeof(PropertyAttribute)) as PropertyAttribute;

@@ -12,12 +12,13 @@ namespace XGraph
     public class BaseGraphView : GraphView
     {
         public BaseGraphData GraphData { get; private set; }
-        public Label GraphNameLabel { get; private set; }
         public string GraphDataFilePath { get; private set;}
 
-        private Dictionary<string, BaseNodeView> nodeViews;
+        private Dictionary<string, BaseNodeView> _nodeViews;
 
-        private MiniMap MiniMap { get; set; }
+        private readonly Label _graphNameLabel;
+        private readonly MiniMap _miniMap;
+        private readonly Blackboard _blackboard;
         
         public virtual Type GraphDataType => typeof(BaseGraphData);
 
@@ -37,7 +38,7 @@ namespace XGraph
             
             graphViewChanged = OnGraphViewChanged;
 
-            nodeViews = new Dictionary<string, BaseNodeView>();
+            _nodeViews = new Dictionary<string, BaseNodeView>();
             
             var labelContainer = new VisualElement
             {
@@ -58,16 +59,16 @@ namespace XGraph
             Insert(0, grid);
             StyleProvider.SetupStyle(grid, "grid-background"); 
             
-            var graphNameLabel = new Label
+            _graphNameLabel= new Label
             {
                 style =
                 {
                     unityTextAlign = TextAnchor.UpperLeft
                 }
             };
-            labelContainer.Add(graphNameLabel);
+            labelContainer.Add(_graphNameLabel);
 
-            MiniMap = new MiniMap
+            _miniMap = new MiniMap
             {
                 maxWidth = 150,
                 maxHeight = 75,
@@ -75,9 +76,15 @@ namespace XGraph
             };
             UpdateMiniMapPosition();
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
-            Add(MiniMap);
-            
-            GraphNameLabel = graphNameLabel;
+            Add(_miniMap);
+
+            _blackboard = new BaseBackboardView(this)
+            {
+                title = "Blackboard",
+                subTitle = "Properties",
+            };
+            _blackboard.SetPosition(new Rect(10, 30, 200, 300));
+            Add(_blackboard);
         }
 
         private void OnGeometryChanged(GeometryChangedEvent evt)
@@ -89,12 +96,12 @@ namespace XGraph
         {
             var parentWidth = layout.width;
             var parentHeight = layout.height;
-            var miniMapWidth = MiniMap.maxWidth;
-            var miniMapHeight = MiniMap.maxHeight;
+            var miniMapWidth = _miniMap.maxWidth;
+            var miniMapHeight = _miniMap.maxHeight;
             var miniMapX = parentWidth - miniMapWidth - 10;  // 10 is the margin from the right
             var miniMapY = parentHeight - miniMapHeight - 10;  // 10 is the margin from the bottom
 
-            MiniMap.SetPosition(new Rect(miniMapX, miniMapY, miniMapWidth, miniMapHeight));
+            _miniMap.SetPosition(new Rect(miniMapX, miniMapY, miniMapWidth, miniMapHeight));
         }
 
         private GraphViewChange OnGraphViewChanged(GraphViewChange graphViewChange)
@@ -155,7 +162,7 @@ namespace XGraph
         {
             GraphData.nodes.Add(nodeData);
             var node = CreateNode(nodeData);
-            nodeViews[node.NodeData.guid] = node;
+            _nodeViews[node.NodeData.guid] = node;
             AddElement(node);
         }
         
@@ -176,16 +183,16 @@ namespace XGraph
         private void RefreshGraphView(BaseGraphData graphData)
         {
             DeleteElements(graphElements.ToList());
-            nodeViews.Clear();
+            _nodeViews.Clear();
 
             GraphData = graphData;
-            GraphNameLabel.text = GraphData.graphName;
+            _graphNameLabel.text = GraphData.graphName;
             
             foreach (var nodeData in GraphData.nodes)
             {
                 var node = CreateNode(nodeData);
                 AddElement(node);
-                nodeViews[node.NodeData.guid] = node;
+                _nodeViews[node.NodeData.guid] = node;
             }
 
             foreach (var edgeData in GraphData.edges)
@@ -280,8 +287,8 @@ namespace XGraph
 
         public Edge CreateEdge(BaseEdgeData baseEdgeData)
         {
-            var outputNode = nodeViews[baseEdgeData.outputNodeGuid];
-            var inputNode = nodeViews[baseEdgeData.inputNodeGuid];
+            var outputNode = _nodeViews[baseEdgeData.outputNodeGuid];
+            var inputNode = _nodeViews[baseEdgeData.inputNodeGuid];
 
             // Find the appropriate ports to connect
             var outputPort = FindPortByName(outputNode.outputContainer, baseEdgeData.outputPortName);

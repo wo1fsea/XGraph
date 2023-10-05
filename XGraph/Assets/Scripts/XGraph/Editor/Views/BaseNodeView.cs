@@ -16,6 +16,8 @@ namespace XGraph
 
         public BaseNodeView(BaseNodeData nodeData)
         {
+            m_CollapseButton.visible = false;
+            
             _nodeData = nodeData;
 
             // 监听位置变化事件
@@ -43,7 +45,7 @@ namespace XGraph
                 if (Attribute.GetCustomAttribute(field, typeof(PropertyAttribute)) is PropertyAttribute
                     propertyAttribute)
                 {
-                    var baseField = PropertyFieldGenerator.GeneratePropertyField(nodeData, field);
+                    var baseField = PropertyFieldGenerator.GenerateNodePropertyField(nodeData, field);
                 
                     if (baseField != null)
                     {

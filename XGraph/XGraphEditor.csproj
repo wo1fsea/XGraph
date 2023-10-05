@@ -45,6 +45,7 @@
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/BaseGraphView.cs" />
      <Compile Include="Assets/Scripts/XGraph/Editor/StyleProvider.cs" />
      <Compile Include="Assets/Scripts/XGraph/Editor/Views/BasePortView.cs" />
+     <Compile Include="Assets/Scripts/XGraph/Editor/Views/BaseBackboardView.cs" />
      <None Include="Assets/Scripts/XGraph/Editor/Resources/StyleSheets/GridBackground.uss" />
      <None Include="Assets/Scripts/XGraph/Editor/Resources/StyleSheets/Node.uss" />
      <None Include="Assets/Scripts/XGraph/Editor/XGraphEditor.asmdef" />
