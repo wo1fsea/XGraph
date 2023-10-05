@@ -8,6 +8,12 @@ namespace XStoryline
 {
     public class XStroylineWindow: BaseGraphViewWindow
     {
+        public override BaseGraphView SetupGraphView()
+        {
+            var graphView = new XStorylineView();
+            return graphView;
+        }
+
         [MenuItem("XStoryline/Show Window")]
         public new static void ShowWindow()
         {

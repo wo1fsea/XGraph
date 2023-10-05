@@ -2,6 +2,7 @@
     "name": "XStorylineEditor",
     "rootNamespace": "",
     "references": [
+        "XStorylineStandalone",
         "XGraphEditor",
         "XGraphStandalone"
     ],

@@ -12,13 +12,20 @@ namespace XGraph
     public class BaseGraphView : GraphView
     {
         public BaseGraphData GraphData { get; private set; }
-        public MiniMap MiniMap { get; private set; }
-        
         public Label GraphNameLabel { get; private set; }
         public string GraphDataFilePath { get; private set;}
 
         private Dictionary<string, BaseNodeView> nodeViews;
 
+        private MiniMap MiniMap { get; set; }
+        
+        public virtual Type GraphDataType => typeof(BaseGraphData);
+
+        public BaseGraphData CreateGraphData()
+        {
+            return Activator.CreateInstance(GraphDataType) as BaseGraphData;
+        } 
+        
         public BaseGraphView()
         {
             this.AddManipulator(new ContentDragger());
@@ -30,7 +37,6 @@ namespace XGraph
             
             graphViewChanged = OnGraphViewChanged;
 
-            GraphData = new BaseGraphData("New Graph");
             nodeViews = new Dictionary<string, BaseNodeView>();
             
             var labelContainer = new VisualElement
@@ -61,7 +67,7 @@ namespace XGraph
             };
             labelContainer.Add(graphNameLabel);
 
-            MiniMap = new MiniMap()
+            MiniMap = new MiniMap
             {
                 maxWidth = 150,
                 maxHeight = 75,
@@ -71,7 +77,6 @@ namespace XGraph
             RegisterCallback<GeometryChangedEvent>(OnGeometryChanged);
             Add(MiniMap);
             
-            graphNameLabel.text = GraphData.graphName;
             GraphNameLabel = graphNameLabel;
         }
 
@@ -170,7 +175,6 @@ namespace XGraph
 
         private void RefreshGraphView(BaseGraphData graphData)
         {
-            
             DeleteElements(graphElements.ToList());
             nodeViews.Clear();
 
@@ -315,7 +319,7 @@ namespace XGraph
                 
         public void OnNew()
         {
-            RefreshGraphView(new BaseGraphData("New Graph"));
+            RefreshGraphView(CreateGraphData());
         }
         
         public void OnSave()

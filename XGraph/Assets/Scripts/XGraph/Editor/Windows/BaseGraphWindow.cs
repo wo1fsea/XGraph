@@ -43,7 +43,8 @@ namespace XGraph
 
         public virtual BaseGraphView SetupGraphView()
         {
-            return new BaseGraphView();
+            var graphView = new BaseGraphView();
+            return graphView;
         }
         
         public virtual VisualElement SetupMainContainer()
@@ -82,6 +83,8 @@ namespace XGraph
             GraphView = SetupGraphView();
             GraphView.style.flexGrow = 1;
             GraphView.style.flexShrink = 0;
+            
+            GraphView.OnNew();
             
             MainContainer = SetupMainContainer();
             ToolbarContainer = SetupToolbarContainer();

@@ -4,8 +4,9 @@ namespace XStoryline
 {
     public class XStorylineGraph: BaseGraphData
     {
-        XStorylineGraph(string name) : base(name)
+        public XStorylineGraph()
         {
+            graphName = "New XStorylineGraph";
         }
     } 
 }

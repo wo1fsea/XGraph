@@ -8,16 +8,15 @@ namespace XGraph
     [Serializable]
     public class BaseGraphData
     {
-        public string graphName;
+        public string graphName = "New Graph";
 
         public List<BaseNodeData> nodes = new();
         public List<BaseEdgeData> edges = new();
 
         public List<StickyNoteData> stickyNotes = new();
 
-        public BaseGraphData(string graphName)
+        public BaseGraphData()
         {
-            this.graphName = graphName;
         }
 
         public static BaseGraphData CreateFromJson(string json)
